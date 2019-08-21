@@ -22,7 +22,8 @@
   ],
 
   "web_accessible_resources": [
-    "extension/fonts/*"
+    "fonts/*",
+    "polyfills/navigator.js"
   ],
 
   "options_ui": {
@@ -54,7 +55,7 @@
       "all_frames": true,
       "match_about_blank": true,
       "matches": ["<all_urls>"],
-      "run_at": "document_start",
+      "run_at": "document_end",
       "js": [
         "extension/js/browser-polyfill.js",
         "extension/js/anime.min.js",

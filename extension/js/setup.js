@@ -140,7 +140,7 @@ if (typeof EXT === 'undefined') (function(){
       browser.runtime.openOptionsPage().then(() => {
         browser.tabs.query({}).then(tabs => {
           this.id = tabs.pop().id;
-          OptionsPage.active[tab.id] = this;
+          OptionsPage.active[this.id] = this;
         })
       })
     }
@@ -157,8 +157,8 @@ if (typeof EXT === 'undefined') (function(){
     },
     initialize: function(win){
       let body = win.document.body;
-      body.style.width = '1000px';
-      body.style.height = '1000px';
+      body.style.width = '1080px';
+      body.style.height = '2000px';
       return browser.tabs.query({}).then(tabs => {
         var tab = tabs.pop();
         var page = OptionsPage.active[tab.id];

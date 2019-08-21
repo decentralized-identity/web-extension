@@ -172,8 +172,6 @@
 
 </body>
 
-<script src="polyfill.js"></script>
-
 <script>
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -201,7 +199,7 @@ did_lookup_form.addEventListener('submit', function(e){
 
 did_request_form.addEventListener('submit', function(e){
   e.preventDefault();
-  navigator.did.requestIdentifier();
+  navigator.did.authenticate();
 });
 
 hub_transaction_form.addEventListener('submit', function(e){
