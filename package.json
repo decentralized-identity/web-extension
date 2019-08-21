@@ -10,6 +10,7 @@
     "koa-router": "7.4.0",
     "koa-mount": "3.0.0",
     "koa-static": "4.0.2",
-    "koa-body": "2.5.0"
+    "koa-body": "2.5.0",
+    "webextension-polyfill": "0.4.0"
   }
 }

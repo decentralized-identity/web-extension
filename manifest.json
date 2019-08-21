@@ -1,0 +1,66 @@
+{
+
+  "description": "Augments your browser to support DID-related API and browser UX polyfills",
+  "manifest_version": 2,
+  "name": "Decentralized Identity",
+  "version": "0.0.1",
+  "author": "DIF",
+  "homepage_url": "https://github.com/decentralized-identity/web-polyfills",
+  "icons": {
+    "48": "extension/images/user-icon-48.png"
+  },
+
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "tabs",
+    "activeTab",
+    "webNavigation",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"
+  ],
+
+  "web_accessible_resources": [
+    "extension/fonts/*"
+  ],
+
+  "options_ui": {
+    "page": "extension/views/options/index.html",
+    "browser_style": true,
+    "chrome_style": true,
+    "open_in_tab": false
+  },
+
+  "browser_action": {
+    "browser_style": true,
+    "default_icon": "extension/images/user-icon-32.png",
+    "default_title": "DID Notification",
+    "default_popup": "extension/views/browser-action/default/index.html"
+  },
+
+  "background": {
+    "persistent": true,
+    "scripts": [
+      "extension/js/browser-polyfill.js",
+      "extension/js/anime.min.js",
+      "extension/js/setup.js",     
+      "extension/js/background.js"
+    ]
+  },
+
+  "content_scripts": [
+    {
+      "all_frames": true,
+      "match_about_blank": true,
+      "matches": ["<all_urls>"],
+      "run_at": "document_start",
+      "js": [
+        "extension/js/browser-polyfill.js",
+        "extension/js/anime.min.js",
+        "extension/js/content.js"
+      ]
+    }
+  ]
+
+}
