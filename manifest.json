@@ -1,6 +1,6 @@
 {
 
-  "description": "Augments your browser to support DID-related API and browser UX polyfills",
+  "description": "Enhance your browser with support for Decentralized Identity",
   "manifest_version": 2,
   "name": "Decentralized Identity",
   "version": "0.0.1",
@@ -23,11 +23,13 @@
 
   "web_accessible_resources": [
     "fonts/*",
+    "extension/js/intents.js",
+    "extension/js/page.js",
     "polyfills/navigator.js"
   ],
 
   "options_ui": {
-    "page": "extension/views/options/index.html",
+    "page": "extension/views/options-page/index.html",
     "browser_style": true,
     "chrome_style": true,
     "open_in_tab": false
@@ -37,13 +39,14 @@
     "browser_style": true,
     "default_icon": "extension/images/user-icon-32.png",
     "default_title": "DID Notification",
-    "default_popup": "extension/views/browser-action/default/index.html"
+    "default_popup": "extension/views/browser-action/index.html"
   },
 
   "background": {
     "persistent": true,
     "scripts": [
       "extension/js/browser-polyfill.js",
+      "extension/js/intents.js",
       "extension/js/anime.min.js",
       "extension/js/setup.js",     
       "extension/js/background.js"
@@ -55,11 +58,14 @@
       "all_frames": true,
       "match_about_blank": true,
       "matches": ["<all_urls>"],
-      "run_at": "document_end",
+      "run_at": "document_start",
       "js": [
         "extension/js/browser-polyfill.js",
+        "extension/js/intents.js",
         "extension/js/anime.min.js",
-        "extension/js/content.js"
+        "extension/js/content.js",
+        "polyfills/navigator.js"
+        
       ]
     }
   ]

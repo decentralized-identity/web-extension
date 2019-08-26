@@ -1,19 +1,18 @@
 
 
-document.addEventListener('click', function(e){
-  console.log(e);
-});
+(function(){
+  
+  let scripts = [
+    'extension/js/intents.js',
+    'extension/js/page.js',
+    'polyfills/navigator.js'
+  ].reduce((frag, src) => {
+    let script = document.createElement('script');
+    script.src = browser.runtime.getURL(src);
+    frag.appendChild(script);
+    return frag;
+  }, document.createDocumentFragment());
 
-console.log(navigator);
+  document.documentElement.appendChild(scripts);
 
-var navigatorScript = document.createElement('script');
-navigatorScript.src = browser.runtime.getURL('polyfills/navigator.js');
-document.head.appendChild(navigatorScript);
-
-window.addEventListener("message", function(event) {
-  if (event.source == window &&
-      event.data &&
-      event.data.direction == "from-page-script") {
-    alert("Content script received message: \"" + event.data.message + "\"");
-  }
-});
+})()

@@ -152,13 +152,13 @@ if (typeof EXT === 'undefined') (function(){
     active: {},
     types: {
       auth: {
-        content: `<h1>Hello World!</h1>`
+        content: `<h1>Scan to authenticate</h1><img src="${browser.extension.getURL('extension/images/btcr-qr-code.png')}" />`
       }
     },
     initialize: function(win){
       let body = win.document.body;
-      body.style.width = '1080px';
-      body.style.height = '2000px';
+      // body.style.width = '1080px';
+      // body.style.height = '2000px';
       return browser.tabs.query({}).then(tabs => {
         var tab = tabs.pop();
         var page = OptionsPage.active[tab.id];

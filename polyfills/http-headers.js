@@ -1,4 +1,11 @@
 
+/*
+Include the DID Headers in all requests
+  DID-Support:
+    0 = no support for DID-related features
+    1 = browser supports DID-related features
+  Did-User: the user owns one or more DIDs
+*/
 
 async function modifyHeader(e) {
   e.requestHeaders['DID-Support'] = 1;

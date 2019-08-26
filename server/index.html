@@ -199,7 +199,7 @@ did_lookup_form.addEventListener('submit', function(e){
 
 did_request_form.addEventListener('submit', function(e){
   e.preventDefault();
-  navigator.did.authenticate();
+  navigator.did.configuration().then(json => console.log(json));
 });
 
 hub_transaction_form.addEventListener('submit', function(e){

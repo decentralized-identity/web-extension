@@ -3,55 +3,41 @@
 
 (function(){
 
-  function uuid() { // IETF RFC 4122, version 4
-    var d = new Date().getTime();
-    if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
-        d += performance.now(); //use high-precision timer if available
-    }
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  //console.log('navigator.js: ' + extensionEnvironment);
+
+  function mapDescriptorById(type, ddo){
+    let obj = {};
+    if (!ddo[type]) (Array.isArray(ddo[type]) ? ddo[type] : [ddo[type]]).forEach(z => {
+      obj[z.id.split('#').pop()] = z
     });
+    return obj;
   }
 
+  class DIDDocumentResult {
+    constructor (did, src){
+      this.did = did;
+      this.resolverData = src;
+      this.document = src.didDocument;
+      this.keys = mapDescriptorById('publicKey', this.document);
+      this.services = mapDescriptorById('services', this.document);
+    }
+  };
+
   if (!navigator.did) {
-    if (!browser || !browser.runtime) {
 
-      var invocations = {};
+    var extension = window.browser && window.browser.extension;
 
-      function invokeMethod(method, args){
-        var id = uuid();
-        return invocations[id] = new Promise((resolve, reject) => {
-          postMessage({
-            id: id,
-            for: 'did-polyfill-extension',
-            method: method,
-            args: Array.from(args)
-          }, '*');
-        });
-      }
-
-      window.addEventListener('message', function(e) {
-        let data = event.data;
-        if (e.source == window && data && data.for === 'did-polyfill-extension') {
-          let invocation = invocations[data.id];
-          if (invocation) {
-            delete invocations[data.id];
-            invocation.resolve(...Array.from(data.result));
-          }
-        }
-      });
+    if (!extension || !extension.onMessage) {
 
       Navigator.prototype.did = {
         resolve (did){
-          return invokeMethod('navigator.did.resolve', arguments);
+          return extensionRequest('navigator.did.resolve', did);
         },
         configuration(){
-          return invokeMethod('navigator.did.configuration');
+          return extensionRequest('navigator.did.configuration', location);
         },
-        authenticate(requestingDID, props){
-          return invokeMethod('navigator.did.authenticate', arguments);
+        authenticate(did, props){
+          return extensionRequest('navigator.did.authenticate', did, props);
         }
       };
     }
@@ -59,26 +45,8 @@
 
       const RESOLVER_ENDPOINT = null; //'http://localhost:3000/1.0/identifiers/';
 
-      function mapDescriptorById(type, ddo){
-        let obj = {};
-        if (!ddo[type]) (Array.isArray(ddo[type]) ? ddo[type] : [ddo[type]]).forEach(z => {
-          obj[z.id.split('#').pop()] = z
-        });
-        return obj;
-      }
-
-      class DIDDocumentResult {
-        constructor (did, src){
-          this.did = did;
-          this.resolverData = src;
-          this.document = src.didDocument;
-          this.keys = mapDescriptorById('publicKey', this.document);
-          this.services = mapDescriptorById('services', this.document);
-        }
-      };
-
       Navigator.prototype.did = {
-        async resolve (did){
+        resolve (did){
           return fetch((RESOLVER_ENDPOINT || 'https://beta.discover.did.microsoft.com/1.0/identifiers/') + did)
             .then(async response => new DIDDocumentResult(did, await response.json()))
             .catch(e => console.log(e));
@@ -87,18 +55,24 @@
           if (location.hostname !== 'localhost' && !location.protocol.match(/^(https)$/)) {
             throw 'unsupported value: protocol of calling origin must be https';
           }
-          fetch(location.origin + '/.well-known/did-configuration').then(async function(response){
-            let json = await response.json();
-            console.log(json);
-          })
+          return fetch(location.origin + '/.well-known/did-configuration').then(async function(response){
+            return await response.json();
+          });
         },
-        async authenticate(requestingDID, props){
-          navigator.did.configuration().then(response => {
-
-            console.log(response);
-          })
+        async authenticate(did, props){
+          return navigator.did.configuration().then(config => {
+            return extensionRequest('browser.tabs.create', {
+              url: browser.extension.getURL('/extension/views/tabs/auth/index.html')
+            }).then(result => result)
+          });
         }
       };
+
+      registerExtensionIntents({
+        'navigator.did.resolve': (did) => navigator.did.resolve(did),
+        'navigator.did.configuration': (location) => navigator.did.configuration(location),
+        'navigator.did.authenticate': (did, props) => navigator.did.authenticate(did, props)
+      })
 
     }
   }

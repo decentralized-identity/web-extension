@@ -2,7 +2,7 @@
 
 // var prompt = new TrustedPrompt({ window: browser.windows.getCurrent() });
 
-var background = browser.extension.getBackgroundPage();
+var background = window.browser.extension.getBackgroundPage();
 var OptionsPage = background.OptionsPage;
 
 OptionsPage.initialize(window).then(page => {
