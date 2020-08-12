@@ -3,7 +3,13 @@
 
 (function(){
 
-  //console.log('navigator.js: ' + extensionEnvironment);
+  window.extensionEnvironment = (() => {
+    var extension = window.browser && window.browser.extension;
+    if (extension && extension.getBackgroundPage) {
+      return extension.getBackgroundPage() === window ? 'background' : 'elevated';
+    }
+    else return !extension || !extension.onMessage ? 'page' : 'content';
+  })();
 
   function mapDescriptorById(type, ddo){
     let obj = {};
@@ -25,53 +31,47 @@
 
   if (!navigator.did) {
 
-    var extension = window.browser && window.browser.extension;
-
-    if (!extension || !extension.onMessage) {
+    if (extensionEnvironment === 'page') {
 
       Navigator.prototype.did = {
         resolve (did){
-          return extensionRequest('navigator.did.resolve', did);
+          return invokeIntent('resolveDID', did);
         },
-        configuration(){
-          return extensionRequest('navigator.did.configuration', location);
+        configuration (){
+          return invokeIntent('getDIDConfiguration');
         },
-        authenticate(did, props){
-          return extensionRequest('navigator.did.authenticate', did, props);
+        authenticate (props = {}){
+          return invokeIntent('authenticateDID', props);
         }
       };
+
     }
     else {
 
+      const unlinkedDID = 'Domain invoked authentication with a DID that failed configuration verification';
       const RESOLVER_ENDPOINT = null; //'http://localhost:3000/1.0/identifiers/';
 
-      Navigator.prototype.did = {
-        resolve (did){
+      registerIntent({
+        'resolveDID': did => {
           return fetch((RESOLVER_ENDPOINT || 'https://beta.discover.did.microsoft.com/1.0/identifiers/') + did)
             .then(async response => new DIDDocumentResult(did, await response.json()))
             .catch(e => console.log(e));
         },
-        async configuration(){
-          if (location.hostname !== 'localhost' && !location.protocol.match(/^(https)$/)) {
-            throw 'unsupported value: protocol of calling origin must be https';
-          }
-          return fetch(location.origin + '/.well-known/did-configuration').then(async function(response){
-            return await response.json();
-          });
-        },
-        async authenticate(did, props){
-          return navigator.did.configuration().then(config => {
-            return extensionRequest('browser.tabs.create', {
-              url: browser.extension.getURL('/extension/views/tabs/auth/index.html')
-            }).then(result => result)
-          });
+        'authenticateDID': (props = {}) => {
+          return invokeIntent('getDIDConfiguration').then(async config => {
+            let entry = config.entries && config.entries[props.did];
+            if (!entry) throw unlinkedDID;
+            await invokeIntent('resolveDID', props.did).then(async ddo => {
+              if (!props.mode) { // assume in-browser UI if no alternate mode declared
+                return await invokeIntent('openAuthTab')
+                                .then(tab => authTab = tab)
+                                .catch(e => console.log(e))
+              }
+            });
+          }).catch(e => {
+            console.log(e);
+          })
         }
-      };
-
-      registerExtensionIntents({
-        'navigator.did.resolve': (did) => navigator.did.resolve(did),
-        'navigator.did.configuration': (location) => navigator.did.configuration(location),
-        'navigator.did.authenticate': (did, props) => navigator.did.authenticate(did, props)
       })
 
     }

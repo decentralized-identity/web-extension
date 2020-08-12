@@ -139,12 +139,22 @@
 
   <main>
 
+    <section id="login">
+      <h2>Login with a DID</h2>
+
+      <form id="login_form">
+
+        <button id="login_submit" type="submit" styled="center">Submit</button>
+
+      </form>
+    </section>
+
     <section id="lookup">
       <h2>Lookup DID</h2>
 
       <form id="did_lookup_form">
 
-        <label text="Secret">
+        <label>
           <input name="did_lookup_input" placeholder="Enter a DID" value="did:foo:123" />
         </label>
 
@@ -160,13 +170,6 @@
       </form>
     </section>
 
-    <section id="transact">
-      <h2>Hub Transaction</h2>
-      <form id="hub_transaction_form">
-        <button id="submit_did_transaction" type="submit" styled="center">Request</button>
-      </form>
-    </section>
-    
 
   </main>
 
@@ -177,6 +180,13 @@
 document.addEventListener('DOMContentLoaded', function(){
   var input = did_lookup_form.elements.did_lookup_input;
   input.value = localStorage.did_lookup_input || input.value;
+});
+
+login_form.addEventListener('submit', function(e){
+  e.preventDefault();
+  navigator.did.authenticate().then(result => {
+    
+  }).catch(e => console.log(e));
 });
 
 did_lookup_form.elements.did_lookup_input.addEventListener('blur', function(e){
@@ -201,27 +211,6 @@ did_request_form.addEventListener('submit', function(e){
   e.preventDefault();
   navigator.did.configuration().then(json => console.log(json));
 });
-
-hub_transaction_form.addEventListener('submit', function(e){
-  e.preventDefault();
-  if (manager) {
-    var txn = manager.transact('Collections/Create', {
-      body: {
-        request: {
-          schema: 'https://www.hl7.org/fhir',
-          type: 'Patient'
-        },
-        payload: {
-          data: {
-            foo: 'bar'
-          }
-        }
-      }
-    });
-  }
-})
-
-
 
 </script>
 

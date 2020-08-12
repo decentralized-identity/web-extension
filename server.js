@@ -11,11 +11,14 @@ const router = new Router();
 
 
 const didConfiguration = {
-  "did:foo:123": {
-    "jwt": "BASE_64"
-  },
-  "did:bar:456": {
-    "jwt": "BASE_64"
+  "entries": {
+    "did:foo:123": {
+      "primary": true,
+      "jwt": "BASE_64"
+    },
+    "did:bar:456": {
+      "jwt": "BASE_64"
+    }
   }
 };
 
@@ -26,6 +29,7 @@ router.get('/', async (ctx, next) => {
 });
 
 router.get('/.well-known/did-configuration', async (ctx, next) => {
+  ctx.type = 'json';
   ctx.response.body = didConfiguration;
   await next();
 });

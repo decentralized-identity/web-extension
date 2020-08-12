@@ -37,9 +37,9 @@
 
   "browser_action": {
     "browser_style": true,
-    "default_icon": "extension/images/user-icon-32.png",
+    "default_icon": "extension/images/favicon/user-disabled.png",
     "default_title": "DID Notification",
-    "default_popup": "extension/views/browser-action/index.html"
+    "default_popup": "extension/views/page-action/index.html"
   },
 
   "background": {
@@ -63,9 +63,9 @@
         "extension/js/browser-polyfill.js",
         "extension/js/intents.js",
         "extension/js/anime.min.js",
-        "extension/js/content.js",
-        "polyfills/navigator.js"
-        
+        "polyfills/did-configuration.js",
+        "polyfills/navigator.js",
+        "extension/js/content.js"       
       ]
     }
   ]

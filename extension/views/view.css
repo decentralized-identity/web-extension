@@ -13,6 +13,20 @@ html, body {
   overflow: hidden;
 }
 
-body {
-  padding: 1em;
+button {
+  padding: 0.5em 0.75em 0.6em;
+  background: #eee;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px 1px rgba(0,0,0,0.4);
+  cursor: pointer;
 }
+
+[entity-theme=""], [entity-theme~="background"] {
+  background: var(--entity-theme-background);
+}
+
+[entity-theme=""], [entity-theme~="text"] {
+  background: var(--entity-theme-text);
+}
+

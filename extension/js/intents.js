@@ -1,6 +1,8 @@
 
 (function(){
 
+  if (!window.EXT) window.EXT = {};
+
   function uuid() { // IETF RFC 4122, version 4
     var d = new Date().getTime();
     if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
@@ -27,13 +29,17 @@
 
   if (extensionEnvironment === 'background') {
 
-    window.registerExtensionIntents = function(intents = {}){
+    window.registerIntent = function(intents = {}){
       for (let z in intents) {
         extensionIntents[z] = async (args) => intents[z](...args);
       }
     }
 
-    function resolveExtensionIntent(port, data){
+    window.invokeIntent = function(intent){
+      return extensionIntents[intent](Array.prototype.slice.call(arguments, 1));
+    }
+
+    window.resolveIntent = function (port, data){
       let intent = extensionIntents[data.intent];
       if (intent) {
         intent(data.args).then(function(){
@@ -48,9 +54,7 @@
     }
 
     browser.runtime.onConnect.addListener(port => {
-      port.onMessage.addListener(function(data) {
-        resolveExtensionIntent(port, data)
-      });
+      port.onMessage.addListener(data => resolveIntent(port, data));
     });
 
   }
@@ -71,7 +75,15 @@
       }
     });
 
-    window.extensionRequest = function(intent){
+    window.registerIntent = function(intents = {}){
+      for (let z in intents) {
+        extensionIntents[z] = async (args) => intents[z](...args);
+      }
+    }
+
+    window.invokeIntent = function(intent){
+      let args = Array.prototype.slice.call(arguments, 1);
+      if (extensionIntents[intent]) return extensionIntents[intent](args);
       let id = uuid();
       let resolve;
       let promise = extensionRequests[id] = new Promise(res => resolve = res);
@@ -81,21 +93,15 @@
         ext: 'did-polyfill',
         from: 'content',
         intent: intent,
-        args: Array.prototype.slice.call(arguments, 1)
+        args: args
       });
       return promise;
     }
 
-    window.registerExtensionIntents = function(intents = {}){
-      for (let z in intents) {
-        extensionIntents[z] = async (args) => intents[z](...args);
-      }
-    }
-
-    function resolveExtensionIntent(data){
+    window.resolveIntent = function (data){
       let intent = extensionIntents[data.intent];
       if (intent) {
-        intent(data.args).then(function(returned){
+        intent(data.args).then(function(){
           postMessage(JSON.stringify({
             id: data.id,
             ext: 'did-polyfill',
@@ -110,8 +116,7 @@
     window.addEventListener('message', function(e) {
       let data = JSON.parse(e.data);
       if (e.source == window && data && data.from === 'page' && data.ext === 'did-polyfill') {
-        console.log(data);
-        resolveExtensionIntent(data);
+        resolveIntent(data);
       }
     });
 
@@ -123,7 +128,7 @@
 
     let extensionRequests = {};
     
-    window.extensionRequest = function(intent){
+    window.invokeIntent = function(intent){
       let id = uuid();
       let resolve;
       let promise = extensionRequests[id] = new Promise(res => resolve = res);
@@ -140,7 +145,6 @@
     
     window.addEventListener('message', function(e) {
       let data = JSON.parse(e.data);
-      this.console.log(data, extensionRequests[data.id]);
       if (e.source == window && data && data.from === 'content' && data.ext === 'did-polyfill') {
         let promise = extensionRequests[data.id];
         if (promise) {
