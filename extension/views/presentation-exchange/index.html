@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>&#8291;</title>
+    <script src="../view-head.js"></script>
+    <link rel="stylesheet" href="../view.css" />
+    <link rel="stylesheet" href="presentation-exchange.css" />
+    <link rel="stylesheet" href="/extension/css/custom-elements.css" />
+    <script src="/extension/js/components.js"></script>
+  </head>
+
+  <body>
+
+
+    <header class="panel-header">
+      <h2>This site is requesting credentials</h2>
+      <span view-action="close" flex="left">✕</span>
+    </header>
+
+    <main>
+
+      <detail-box>
+        <label>Always allow this site to request credentials? <input type="checkbox"/></label>
+        <label>Block this site from requesting credentials? <button type="button">BLOCK</button></label>
+      </detail-box>
+
+
+    </main>
+
+
+    <script src="/extension/js/polyfills/web-extension-polyfill.js"></script>
+    <script src="/extension/js/utils.js"></script>
+    <script src="/extension/js/anime.min.js"></script>
+    <script src="../view-body.js"></script>
+    <script src="presentation-exchange.css"></script>
+  </body>
+
+</html>

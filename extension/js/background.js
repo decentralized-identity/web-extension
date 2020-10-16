@@ -1,70 +1,73 @@
 
 (function(){
-  
-  var authTabs = window.authTabs = {};
 
-  browser.tabs.onRemoved.addListener(id => {
-    let tab = authTabs[id];
-    if (tab) {
-      delete authTabs[id];
-      if (tab.type === 'opener') {
-        browser.tabs.remove(tab.auth.id);
-        delete authTabs[tab.auth.id];
+  const extensionURL = browser.runtime.getURL('/');
+  const dashboardURL = extensionURL + 'extension/views/dashboard/index.html';
+  const imageURL = extensionURL + 'extension/images/icons/';
+  const darkMode = matchMedia('(prefers-color-scheme: dark)').matches;
+
+  if (darkMode) {
+    browser.browserAction.setIcon({
+      path: {
+        16: imageURL + 'user-16-dark-mode.png',
+        24: imageURL + 'user-24-dark-mode.png',
+        32: imageURL + 'user-24-dark-mode.png'
       }
-      delete authTabs[tab.opener.id];
-    }
+    })
+  }
+
+  function createOrActivateTab(url){
+    browser.tabs.query({
+      url: [url, url + '?*'],
+      currentWindow: true
+    }).then(tabs => {
+      if (!tabs.length) browser.tabs.create({ url: url });
+      else browser.tabs.update(tabs[0].id, { active: true });
+    })
+  }
+
+  browser.browserAction.onClicked.addListener(tab => {
+    createOrActivateTab(dashboardURL);
   });
 
-  const badgeStates = {
-    pending: ['#0000FF', '?'],
-    confirmed: ['#228B22', '✓'],
-    invalid: ['#FF0000', '!']
-  };
 
-  registerIntent({
-    'browser.tabs.create': browser.tabs.create,
-    'setActionState': (obj = {}) => {
-      let state = badgeStates[obj.state || 'invalid'];
-      browser.browserAction.setIcon({
-        tabId: obj.tabId,
-        path: `extension/images/favicon/user.png`
-      });
-      browser.browserAction.setBadgeBackgroundColor({
-        tabId: obj.tabId,
-        color: state[0]
-      });
-      browser.browserAction.setBadgeText({
-        tabId: obj.tabId,
-        text: state[1]
-      });
-    },
-    'disableAction': (tabID) =>  {
-      
-    },
-    'getCurrentTab': () => {
-      return browser.tabs.query({ active: true }).then(tabs => tabs.pop())
-    },
-    'openAuthTab': () => {
-      return browser.tabs.query({ active: true }).then(tabs => {
-        let opener = tabs.pop();
-        if (!opener) throw 'Refused to open auth tab for specified page';
-        let existing = authTabs[opener.id];
-        if (existing && existing.auth) return invokeIntent('focusTab', existing.auth.id);
-        let entry = authTabs[opener.id] = { type: 'opener', opener: opener };
-        return browser.tabs.create({
-          index: opener.index + 1,
-          url: browser.extension.getURL(`/extension/views/tabs/auth/index.html?opener=${opener.id}`)
-        }).then(authTab => {
-          entry.auth = authTab;
-          authTabs[authTab.id] = { type: 'auth', opener: opener, auth: authTab };
-          return authTab;
-        })
-      });
-      
-    },
-    'focusTab': id => {
-      return browser.tabs.update(id, { active: true, highlighted: true })
-    }
-  });
+  
+  // ['page', 'frame', 'content', 'background'].forEach(env => {
+  //   [true, false].forEach(untrusted => {
+  //   let message = env + '_to_' + EXT.environment + (untrusted ? '' : '_block');
+  //   if (env !== EXT.environment) {
+  //       EXT.addMessageHandlers({
+  //         [message]: {
+  //           untrusted: untrusted,
+  //           action: (props) => {
+  //             console.log(message + ' message handled');
+  //             return message + ' callback sent to ' + env;
+  //           }
+  //         }
+  //       });     
+  //     }
+  //   })
+  // });
+
+  // window.sendTestMessages = function(){
+
+  //   ['page', 'frame', 'content', 'background'].forEach(env => {
+  //     let message = EXT.environment + '_to_' + env
+  //     if (env !== EXT.environment) {
+  //       EXT.sendMessage({
+  //         type: EXT.environment + '_to_' + env,
+  //         to: env,
+  //         callback: response => {
+  //           console.log(message + ' callback arrived at ' + EXT.environment)
+  //         },
+  //         error: error => {
+  //           console.log(error)
+  //         }
+  //       });   
+  //     }
+
+  //   });
+
+  // };
 
 })();

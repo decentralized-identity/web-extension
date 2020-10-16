@@ -7,7 +7,11 @@
   "author": "DIF",
   "homepage_url": "https://github.com/decentralized-identity/web-polyfills",
   "icons": {
-    "48": "extension/images/user-icon-48.png"
+    "16": "extension/images/icons/user-16.png",
+    "24": "extension/images/icons/user-24.png",
+    "48": "extension/images/icons/user-64.png",
+    "64": "extension/images/icons/user-64.png",
+    "128": "extension/images/icons/user-128.png"
   },
 
   "permissions": [
@@ -23,48 +27,47 @@
 
   "web_accessible_resources": [
     "fonts/*",
-    "extension/js/intents.js",
-    "extension/js/page.js",
-    "polyfills/navigator.js"
+    "extension/css/pages.css",
+    "extension/js/utils.js",
+    "extension/js/polyfills/navigator.js", 
+    "extension/views/*"
   ],
 
   "options_ui": {
-    "page": "extension/views/options-page/index.html",
     "browser_style": true,
     "chrome_style": true,
-    "open_in_tab": false
+    "open_in_tab": false,
+    "page": "extension/views/options/index.html"
   },
 
   "browser_action": {
     "browser_style": true,
-    "default_icon": "extension/images/favicon/user-disabled.png",
-    "default_title": "DID Notification",
-    "default_popup": "extension/views/page-action/index.html"
+    "chrome_style": true,
+    "default_icon": "extension/images/icons/user-24.png",
+    "default_title": "DID Browser"
   },
 
   "background": {
     "persistent": true,
     "scripts": [
-      "extension/js/browser-polyfill.js",
-      "extension/js/intents.js",
-      "extension/js/anime.min.js",
-      "extension/js/setup.js",     
+      "extension/js/polyfills/web-extension-polyfill.js",
+      "extension/js/utils.js",
       "extension/js/background.js"
     ]
   },
 
   "content_scripts": [
     {
-      "all_frames": true,
       "match_about_blank": true,
       "matches": ["<all_urls>"],
       "run_at": "document_start",
+      "css" : [
+        "extension/css/pages.css"
+      ],
       "js": [
-        "extension/js/browser-polyfill.js",
-        "extension/js/intents.js",
+        "extension/js/polyfills/web-extension-polyfill.js",
         "extension/js/anime.min.js",
-        "polyfills/did-configuration.js",
-        "polyfills/navigator.js",
+        "extension/js/utils.js",
         "extension/js/content.js"       
       ]
     }

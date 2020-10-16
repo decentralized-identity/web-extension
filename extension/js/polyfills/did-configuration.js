@@ -18,7 +18,7 @@
     });
   }
 
-  configuration = getConfiguration();
+  configuration = getConfiguration().catch(e => console.log(e));
 
   registerIntent({
     'getDIDConfiguration': getConfiguration

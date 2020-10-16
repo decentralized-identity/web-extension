@@ -1,0 +1,20 @@
+
+
+#did_ua_extension_sidebar {
+  --shadow: 5px;
+  contain: strict;
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: calc(100% - 5vw);
+  max-width: 500px;
+  border: none;
+  transform: translateX(calc(100% + var(--shadow)));
+  transition: transform 0.5s ease;
+  box-shadow: 0 0 var(--shadow) 0px rgba(0,0,0,0.5);
+}
+
+#did_ua_extension_sidebar[open] {
+  transform: translateX(0%);  
+}
