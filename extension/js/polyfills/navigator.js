@@ -1,7 +1,7 @@
   
   // check to see if executing in a page script
 
-PE = {
+var PE = {
   "submission_requirements": [
     {
       "name": "Banking Information",
@@ -243,7 +243,7 @@ PE = {
           EXT.addMessageHandlers({
             [message]: {
               untrusted: true,
-              action: (props) => {
+              action: (message) => {
                 console.log(message + ' message handled');
                 return message + ' callback sent to ' + env;
               }
@@ -253,8 +253,8 @@ PE = {
       });
 
       EXT.addMessageHandlers({
-        'sidebar_close': (props) => {
-          console.log('page sidebar_close', props);
+        'sidebar_close': (message) => {
+          console.log('page sidebar_close', message.props);
           return 'sidebar_close from page handler';
         }
       });
@@ -269,6 +269,23 @@ PE = {
         authenticate (props = {}){
           //return invokeIntent('authenticateDID', props);
         },
+        requestDid (nonce){
+          return new Promise ((resolve, reject) => {
+            if (!nonce) return reject('DataError: required nonce parameter is missing');
+            EXT.sendMessage({
+              type: 'did_request',
+              to: 'content',
+              props: {
+                nonce: nonce
+              },
+              callback: response => {
+                console.log(response);
+                resolve(response);
+              },
+              error: error => reject(error)
+            });
+          })
+        },
         requestCredentials (presentationDefinition = PE){
           return new Promise ((resolve, reject) => {
             EXT.sendMessage({
@@ -282,14 +299,13 @@ PE = {
                 resolve(response);
               },
               error: error => {
-                console.log(error)
+                reject(error);
               }
             });
           })
         }
 
       };
-
     }
     else {
 

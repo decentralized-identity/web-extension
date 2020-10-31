@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../view.css" />
     <link rel="stylesheet" href="dashboard.css" />
     <link rel="stylesheet" href="/extension/css/font-awesome.css" />
-    <script src="/extension/js/components.js"></script>
+    <script src="/extension/js/custom-elements.js" type="module"></script>
   </head>
 
   <body>
@@ -53,24 +53,38 @@
           <header>
             <h2><i class="fas fa-user"></i>Personas</h2>
             <nav>
-              <a>Link 1</a>
+              <!-- <a>Link 1</a>
               <a>Link 2</a>
               <a>Link 3</a>
-              <a>✕</a>
+              <a>✕</a> -->
             </nav>
           </header>
+
           <section>
-            <ul id="public_personas"></ul>
-            <div id="no_personas">
-              <i class="fas fa-users"></i>
-              <h3>Create a Persona</h3>
-              <p>Personas are public versions of your identity you share with other people, 
-                apps, and services. Personas can be linked to you, so only use a Persona if 
-                you want to interact publicly.
-              </p>
-              <button class="create-persona" type="button">+ Create a new Persona</button>
+
+
+            <div id="persona_dids">
+
+              <persona-list id="persona_did_list" list="block" autoload-personas></persona-list>
+
+              <ul id="peer_did_list"></ul>      
+
+              <nav id="persona_did_nav" toolbar>
+                <input placeholder="Filter DIDs"/>
+                <button modal="create-persona" options="icon">+ <i class="fas fa-user"></i></button>
+              </nav>
+
+              <div id="no_personas">
+                <i class="fas fa-users"></i>
+                <h3>Create a Persona</h3>
+                <p>Personas are public versions of your identity you share with other people, 
+                  apps, and services. Personas can be linked to you, so only use a Persona if 
+                  you want to interact publicly.
+                </p>
+                <button modal="create-persona" type="button">+ Create a new Persona</button>
+              </div>
+
             </div>
-            <ul id="private_identifiers"></ul>
           </section>
         </slide-panel>
 
@@ -79,14 +93,16 @@
           <header>
             <h2><i class="fas fa-bell"></i>Notifications</h2>
             <nav>
-              <a>Link 1</a>
+              <!-- <a>Link 1</a>
               <a>Link 2</a>
               <a>Link 3</a>
-              <a>✕</a>
+              <a>✕</a> -->
             </nav>
           </header>
           <section>
             Foo
+            <div class="test-block"></div>
+            Bar
           </section>
         </slide-panel>
 
@@ -94,14 +110,16 @@
           <header>
             <h2><i class="fas fa-people-arrows"></i>Connections</h2>
             <nav>
-              <a>Link 1</a>
+              <!-- <a>Link 1</a>
               <a>Link 2</a>
               <a>Link 3</a>
-              <a>✕</a>
+              <a>✕</a> -->
             </nav>
           </header>
           <section>
             Foo
+            <div class="test-block"></div>
+            Bar
           </section>
         </slide-panel>
 
@@ -109,14 +127,16 @@
           <header>
             <h2><i class="fas fa-file-signature"></i>Credentials</h2>
             <nav>
-              <a href="https://google.com">Link 1</a>
+              <!-- <a href="https://google.com">Link 1</a>
               <a>Link 2</a>
               <a>Link 3</a>
-              <a>✕</a>
+              <a>✕</a> -->
             </nav>
           </header>
           <section>
             Foo
+            <div class="test-block"></div>
+            Bar
           </section>
         </slide-panel>
 
@@ -124,14 +144,14 @@
           <header>
             <h2><i class="fas fa-database"></i>Apps & Data</h2>
             <nav>
-              <a>Link 1</a>
+              <!-- <a>Link 1</a>
               <a>Link 2</a>
               <a>Link 3</a>
-              <a>✕</a>
+              <a>✕</a> -->
             </nav>
           </header>
           <section>
-            Foo
+
           </section>
         </slide-panel>
 
@@ -139,14 +159,16 @@
           <header>
             <h2><i class="fas fa-search"></i>Searching for "<span id="global_search_query"></span>"</h2>
             <nav>
-              <a>Link 1</a>
+              <!-- <a>Link 1</a>
               <a>Link 2</a>
               <a>Link 3</a>
-              <a>✕</a>
+              <a>✕</a> -->
             </nav>
           </header>
           <section>
             Foo
+            <div class="test-block"></div>
+            Bar
           </section>
         </slide-panel>
         
@@ -159,41 +181,26 @@
         <header>
           <h3>Create a new Persona</h3><span modal-close>⨉</span>
         </header>
-        <label>Name your new Persona:
-          <input placeholder="Persona Name" />
-        </label>
-        <label>Pick an icon to represent this Persona:
-          <ul id="persona_create_modal_icons" class="persona-selection-list">
-            <li>
-              <i class="fas fa-user"></i>
-              <h4>Public</h4>
-            </li>
-            <li>
-              <i class="fas fa-user-tie"></i>
-              <h4>Career</h4>
-            </li>
-            <li>
-              <i class="fas fa-gamepad"></i>
-              <h4>Gamer</h4>
-            </li>
-            <li id="persona_create_modal_custom">
-              <i class="fas fa-plus"></i>
-              <h4>Custom</h4>
-            </li>
-          </ul>
-        </label>
+
+        <form id="persona_create_form">
+          <label>Name your new Persona:
+            <input id="persona_create_name" placeholder="Ex: Public, Personal, Career, etc." required pattern="\w+"/>
+          </label>
+          <label>Pick an icon to represent this Persona:</label>
+          <ul id="persona_create_icons" class="persona-selection-list"></ul>
+        </form>
+
         <footer>
-          <button type="button">Cancel</button>
-          <button type="button">Create</button>
+          <button type="button" modal-close>Cancel</button>
+          <button id="persona_create_submit" type="submit" form="persona_create_form">Create</button>
         </footer>
       </section>
     </modal-overlay>
     
-    <script src="/extension/js/polyfills/web-extension-polyfill.js"></script>
-    <script src="/extension/js/utils.js"></script>
-    <script src="../view.js"></script>
-    <script src="/extension/js/anime.min.js"></script>
-    <script src="dashboard.js"></script>
+    <script src="/extension/js/polyfills/web-extensions.js"></script>
+    <script src="/extension/js/utils.js" type="module"></script>
+    <script src="../view.js" type="module"></script>
+    <script src="dashboard.js" type="module"></script>
   </body>
 
 </html>

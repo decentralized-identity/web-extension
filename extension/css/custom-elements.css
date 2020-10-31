@@ -6,8 +6,8 @@ slide-panels {
   height: 100%;
   width: 100%;
   pointer-events: none;
+  overflow: hidden;
   z-index: 100;
-  contain: paint;
 }
 
 slide-panels:before {
@@ -37,7 +37,7 @@ slide-panel {
   position: absolute;
   top: 0;
   left: 0;
-  bottom: 0;
+  height: 100%;
   background: #fff;
   box-shadow: 0 0 5px 1px rgba(0,0,0,0.15);
   transform: translate3d(-100%, 0%, 0);
@@ -69,8 +69,22 @@ slide-panel:not([open]):not([options~="pointer-events"]) {
   pointer-events: none;
 }
 
-slide-panel > *:not(header):not(footer) {
+slide-panel > * {
+  box-sizing: border-box;
+}
+
+/* slide-panel > *:not(header):not(footer) {
   flex: 1;
+} */
+
+slide-panel > section {
+  overflow: auto;
+}
+
+slide-panel > header,
+slide-panel > footer {
+  flex: none;
+  z-index: 1;
 }
 
 /* DETAIL-BOX */
@@ -207,6 +221,99 @@ modal-overlay > section > footer {
   justify-content: flex-end;
 }
 
+modal-overlay > section > footer:not(empty) {
+  padding: 1em 0 0;
+}
+
 modal-overlay > section > footer > * {
   margin: auto 0.5em;
+}
+
+/* NOTICE-BAR */
+
+notice-bar {
+  display: block;
+  box-sizing: border-box;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 0.9em 1em;
+  color: #000;
+  background: #fff;
+  opacity: 0;
+  transform: translateY(100%);
+  --notice-duration: 3s;
+  --notice-interaction-exit: 1s;
+  transition: transform ease, opacity ease;
+  transition-delay: var(--notice-duration);
+  transition-duration: 0.4s;
+  z-index: 101;
+}
+
+notice-bar:hover,
+notice-bar[notice-state="show"] {
+  opacity: 1;
+  transform: translateY(0%);
+  --notice-duration: 0s;
+}
+
+notice-bar[notice-interaction]:not(:hover) {
+  transition-delay: var(--notice-interaction-exit);
+}
+
+notice-bar[notice-position="top"] {
+  bottom: auto;
+  top: 0;
+  transform: translateY(-100%);
+}
+
+notice-bar > header:not(:empty) {
+  font-weight: bold;
+}
+
+notice-bar > header:not(:empty) + section:not(:empty) {
+  margin: 0.4em 0 0;
+}
+
+notice-bar > section:not(:empty) + footer:not(:empty) {
+  margin: 0.5em 0 0;
+}
+
+/* PERSONA-LIST */
+
+persona-list {
+  text-align: center;
+}
+
+persona-list > div {
+  width: 8em;
+  margin: 0 1em;
+  cursor: pointer;
+  will-change: transform, opacity;
+}
+
+persona-list > div[persona-state="add"] {
+  opacity: 0;
+  transform: scale(0.25);
+  animation: scale-in 0.5s cubic-bezier(.47,1.64,.41,.8) 0.3s forwards;
+}
+
+persona-list i {
+  font-size: 3em;
+}
+
+persona-list h3 {
+  margin: 0.5em 0 0;
+}
+
+
+/* Animations */
+
+@keyframes scale-in {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

@@ -1,4 +1,7 @@
-(function (global, factory) {
+
+        let pageScript = document.createElement('script');
+        pageScript.async = false;
+        pageScript.textContent = '(' + (function(){ (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define("webextension-polyfill", ["module"], factory);
   } else if (typeof exports !== "undefined") {
@@ -10,10 +13,13 @@
     factory(mod);
     global.browser = mod.exports;
   }
-})(this, function (module) {
-  /* webextension-polyfill - v0.4.0 - Wed Feb 06 2019 11:58:31 */
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (module) {
+  /* webextension-polyfill - v0.6.0 - Mon Dec 23 2019 12:32:53 */
+
   /* -*- Mode: indent-tabs-mode: nil; js-indent-level: 2 -*- */
+
   /* vim: set sts=2 sw=2 et tw=80: */
+
   /* This Source Code Form is subject to the terms of the Mozilla Public
    * License, v. 2.0. If a copy of the MPL was not distributed with this
    * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -21,13 +27,12 @@
 
   if (typeof browser === "undefined" || Object.getPrototypeOf(browser) !== Object.prototype) {
     const CHROME_SEND_MESSAGE_CALLBACK_NO_RESPONSE_MESSAGE = "The message port closed before a response was received.";
-    const SEND_RESPONSE_DEPRECATION_WARNING = "Returning a Promise is the preferred way to send a reply from an onMessage/onMessageExternal listener, as the sendResponse will be removed from the specs (See https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage)";
-
-    // Wrapping the bulk of this polyfill in a one-time-use function is a minor
+    const SEND_RESPONSE_DEPRECATION_WARNING = "Returning a Promise is the preferred way to send a reply from an onMessage/onMessageExternal listener, as the sendResponse will be removed from the specs (See https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage)"; // Wrapping the bulk of this polyfill in a one-time-use function is a minor
     // optimization for Firefox. Since Spidermonkey does not fully parse the
     // contents of a function until the first time it's called, and since it will
     // never actually need to be called, this allows the polyfill to be included
     // in Firefox nearly for free.
+
     const wrapAPIs = extensionAPIs => {
       // NOTE: apiMetadata is associated to the content of the api-metadata.json file
       // at build time by replacing the following "include" with the content of the
@@ -456,10 +461,6 @@
             "minArgs": 0,
             "maxArgs": 0
           },
-          "getBrowserInfo": {
-            "minArgs": 0,
-            "maxArgs": 0
-          },
           "getPlatformInfo": {
             "minArgs": 0,
             "maxArgs": 0
@@ -698,7 +699,6 @@
       if (Object.keys(apiMetadata).length === 0) {
         throw new Error("api-metadata.json has not been included in browser-polyfill");
       }
-
       /**
        * A WeakMap subclass which creates and stores a value for any key which does
        * not exist when accessed, but behaves exactly as an ordinary WeakMap
@@ -709,6 +709,8 @@
        *        key which does not exist, the first time it is accessed. The
        *        function receives, as its only argument, the key being created.
        */
+
+
       class DefaultWeakMap extends WeakMap {
         constructor(createItem, items = undefined) {
           super(items);
@@ -722,8 +724,8 @@
 
           return super.get(key);
         }
-      }
 
+      }
       /**
        * Returns true if the given object is an object with a `then` method, and can
        * therefore be assumed to behave as a Promise.
@@ -731,10 +733,11 @@
        * @param {*} value The value to test.
        * @returns {boolean} True if the value is thenable.
        */
+
+
       const isThenable = value => {
         return value && typeof value === "object" && typeof value.then === "function";
       };
-
       /**
        * Creates and returns a function which, when called, will resolve or reject
        * the given promise based on how it is called:
@@ -762,6 +765,8 @@
        * @returns {function}
        *        The generated callback function.
        */
+
+
       const makeCallback = (promise, metadata) => {
         return (...callbackArgs) => {
           if (extensionAPIs.runtime.lastError) {
@@ -775,7 +780,6 @@
       };
 
       const pluralizeArguments = numArgs => numArgs == 1 ? "argument" : "arguments";
-
       /**
        * Creates a wrapper function for a method with the given name and metadata.
        *
@@ -798,6 +802,8 @@
        * @returns {function(object, ...*)}
        *       The generated wrapper function.
        */
+
+
       const wrapAsyncFunction = (name, metadata) => {
         return function asyncFunctionWrapper(target, ...args) {
           if (args.length < metadata.minArgs) {
@@ -814,29 +820,31 @@
               // and so the polyfill will try to call it with a callback first, and it will fallback
               // to not passing the callback if the first call fails.
               try {
-                target[name](...args, makeCallback({ resolve, reject }, metadata));
+                target[name](...args, makeCallback({
+                  resolve,
+                  reject
+                }, metadata));
               } catch (cbError) {
                 console.warn(`${name} API method doesn't seem to support the callback parameter, ` + "falling back to call it without a callback: ", cbError);
-
-                target[name](...args);
-
-                // Update the API method metadata, so that the next API calls will not try to
+                target[name](...args); // Update the API method metadata, so that the next API calls will not try to
                 // use the unsupported callback anymore.
+
                 metadata.fallbackToNoCallback = false;
                 metadata.noCallback = true;
-
                 resolve();
               }
             } else if (metadata.noCallback) {
               target[name](...args);
               resolve();
             } else {
-              target[name](...args, makeCallback({ resolve, reject }, metadata));
+              target[name](...args, makeCallback({
+                resolve,
+                reject
+              }, metadata));
             }
           });
         };
       };
-
       /**
        * Wraps an existing method of the target object, so that calls to it are
        * intercepted by the given wrapper function. The wrapper function receives,
@@ -856,16 +864,18 @@
        *        A Proxy object for the given method, which invokes the given wrapper
        *        method in its place.
        */
+
+
       const wrapMethod = (target, method, wrapper) => {
         return new Proxy(method, {
           apply(targetMethod, thisObj, args) {
             return wrapper.call(thisObj, target, ...args);
           }
+
         });
       };
 
       let hasOwnProperty = Function.call.bind(Object.prototype.hasOwnProperty);
-
       /**
        * Wraps an object in a Proxy which intercepts and wraps certain methods
        * based on the given `wrappers` and `metadata` objects.
@@ -889,6 +899,7 @@
        *
        * @returns {Proxy<object>}
        */
+
       const wrapObject = (target, wrappers = {}, metadata = {}) => {
         let cache = Object.create(null);
         let handlers = {
@@ -910,7 +921,6 @@
             if (typeof value === "function") {
               // This is a method on the underlying object. Check if we need to do
               // any wrapping.
-
               if (typeof wrappers[prop] === "function") {
                 // We have a special-case wrapper for this method.
                 value = wrapMethod(target, target[prop], wrappers[prop]);
@@ -929,20 +939,25 @@
               // of. Create a sub-object wrapper for it with the appropriate child
               // metadata.
               value = wrapObject(value, wrappers[prop], metadata[prop]);
+            } else if (hasOwnProperty(metadata, "*")) {
+              // Wrap all properties in * namespace.
+              value = wrapObject(value, wrappers[prop], metadata["*"]);
             } else {
               // We don't need to do any wrapping for this property,
               // so just forward all access to the underlying object.
               Object.defineProperty(cache, prop, {
                 configurable: true,
                 enumerable: true,
+
                 get() {
                   return target[prop];
                 },
+
                 set(value) {
                   target[prop] = value;
                 }
-              });
 
+              });
               return value;
             }
 
@@ -956,6 +971,7 @@
             } else {
               target[prop] = value;
             }
+
             return true;
           },
 
@@ -966,9 +982,8 @@
           deleteProperty(proxyTarget, prop) {
             return Reflect.deleteProperty(cache, prop);
           }
-        };
 
-        // Per contract of the Proxy API, the "get" proxy handler must return the
+        }; // Per contract of the Proxy API, the "get" proxy handler must return the
         // original value of the target if that value is declared read-only and
         // non-configurable. For this reason, we create an object with the
         // prototype set to `target` instead of using `target` directly.
@@ -978,10 +993,10 @@
         // The proxy handlers themselves will still use the original `target`
         // instead of the `proxyTarget`, so that the methods and properties are
         // dereferenced via the original targets.
+
         let proxyTarget = Object.create(target);
         return new Proxy(proxyTarget, handlers);
       };
-
       /**
        * Creates a set of wrapper functions for an event object, which handles
        * wrapping of listener functions that those messages are passed.
@@ -998,6 +1013,8 @@
        *
        * @returns {object}
        */
+
+
       const wrapEvent = wrapperMap => ({
         addListener(target, listener, ...args) {
           target.addListener(wrapperMap.get(listener), ...args);
@@ -1010,16 +1027,15 @@
         removeListener(target, listener) {
           target.removeListener(wrapperMap.get(listener));
         }
-      });
 
-      // Keep track if the deprecation warning has been logged at least once.
+      }); // Keep track if the deprecation warning has been logged at least once.
+
+
       let loggedSendResponseDeprecationWarning = false;
-
       const onMessageWrappers = new DefaultWeakMap(listener => {
         if (typeof listener !== "function") {
           return listener;
         }
-
         /**
          * Wraps a message listener function so that it may send responses based on
          * its return value, rather than by returning a sentinel value and calling a
@@ -1037,9 +1053,10 @@
          *        True if the wrapped listener returned a Promise, which will later
          *        yield a response. False otherwise.
          */
+
+
         return function onMessage(message, sender, sendResponse) {
           let didCallSendResponse = false;
-
           let wrappedSendResponse;
           let sendResponsePromise = new Promise(resolve => {
             wrappedSendResponse = function (response) {
@@ -1047,31 +1064,31 @@
                 console.warn(SEND_RESPONSE_DEPRECATION_WARNING, new Error().stack);
                 loggedSendResponseDeprecationWarning = true;
               }
+
               didCallSendResponse = true;
               resolve(response);
             };
           });
-
           let result;
+
           try {
             result = listener(message, sender, wrappedSendResponse);
           } catch (err) {
             result = Promise.reject(err);
           }
 
-          const isResultThenable = result !== true && isThenable(result);
-
-          // If the listener didn't returned true or a Promise, or called
+          const isResultThenable = result !== true && isThenable(result); // If the listener didn't returned true or a Promise, or called
           // wrappedSendResponse synchronously, we can exit earlier
           // because there will be no response sent from this listener.
+
           if (result !== true && !isResultThenable && !didCallSendResponse) {
             return false;
-          }
-
-          // A small helper to send the message if the promise resolves
+          } // A small helper to send the message if the promise resolves
           // and an error if the promise rejects (a wrapped sendMessage has
           // to translate the message into a resolved promise or a rejected
           // promise).
+
+
           const sendPromisedResult = promise => {
             promise.then(msg => {
               // send the message value.
@@ -1080,6 +1097,7 @@
               // Send a JSON representation of the error if the rejected value
               // is an instance of error, or the object itself otherwise.
               let message;
+
               if (error && (error instanceof Error || typeof error.message === "string")) {
                 message = error.message;
               } else {
@@ -1094,23 +1112,26 @@
               // Print an error on the console if unable to send the response.
               console.error("Failed to send onMessage rejected reply", err);
             });
-          };
-
-          // If the listener returned a Promise, send the resolved value as a
+          }; // If the listener returned a Promise, send the resolved value as a
           // result, otherwise wait the promise related to the wrappedSendResponse
           // callback to resolve and send it as a response.
+
+
           if (isResultThenable) {
             sendPromisedResult(result);
           } else {
             sendPromisedResult(sendResponsePromise);
-          }
+          } // Let Chrome know that the listener is replying.
 
-          // Let Chrome know that the listener is replying.
+
           return true;
         };
       });
 
-      const wrappedSendMessageCallback = ({ reject, resolve }, reply) => {
+      const wrappedSendMessageCallback = ({
+        reject,
+        resolve
+      }, reply) => {
         if (extensionAPIs.runtime.lastError) {
           // Detect when none of the listeners replied to the sendMessage call and resolve
           // the promise to undefined as in Firefox.
@@ -1139,7 +1160,10 @@
         }
 
         return new Promise((resolve, reject) => {
-          const wrappedCb = wrappedSendMessageCallback.bind(null, { resolve, reject });
+          const wrappedCb = wrappedSendMessageCallback.bind(null, {
+            resolve,
+            reject
+          });
           args.push(wrappedCb);
           apiNamespaceObj.sendMessage(...args);
         });
@@ -1149,39 +1173,739 @@
         runtime: {
           onMessage: wrapEvent(onMessageWrappers),
           onMessageExternal: wrapEvent(onMessageWrappers),
-          sendMessage: wrappedSendMessage.bind(null, "sendMessage", { minArgs: 1, maxArgs: 3 })
+          sendMessage: wrappedSendMessage.bind(null, "sendMessage", {
+            minArgs: 1,
+            maxArgs: 3
+          })
         },
         tabs: {
-          sendMessage: wrappedSendMessage.bind(null, "sendMessage", { minArgs: 2, maxArgs: 3 })
+          sendMessage: wrappedSendMessage.bind(null, "sendMessage", {
+            minArgs: 2,
+            maxArgs: 3
+          })
         }
       };
       const settingMetadata = {
-        clear: { minArgs: 1, maxArgs: 1 },
-        get: { minArgs: 1, maxArgs: 1 },
-        set: { minArgs: 1, maxArgs: 1 }
+        clear: {
+          minArgs: 1,
+          maxArgs: 1
+        },
+        get: {
+          minArgs: 1,
+          maxArgs: 1
+        },
+        set: {
+          minArgs: 1,
+          maxArgs: 1
+        }
       };
       apiMetadata.privacy = {
         network: {
-          networkPredictionEnabled: settingMetadata,
-          webRTCIPHandlingPolicy: settingMetadata
+          "*": settingMetadata
         },
         services: {
-          passwordSavingEnabled: settingMetadata
+          "*": settingMetadata
         },
         websites: {
-          hyperlinkAuditingEnabled: settingMetadata,
-          referrersEnabled: settingMetadata
+          "*": settingMetadata
         }
       };
-
       return wrapObject(extensionAPIs, staticWrappers, apiMetadata);
     };
 
-    // The build process adds a UMD wrapper around this file, which makes the
-    // `module` variable available.
     module.exports = wrapAPIs(chrome);
   } else {
     module.exports = browser;
   }
 });
-//# sourceMappingURL=browser-polyfill.js.map
+//# sourceMappingURL=browser-polyfill.js.map;
+(function(){
+
+let env = (() => {
+  var extension = globalThis.browser && globalThis.browser.extension;
+  if (extension && extension.getBackgroundPage) {
+    return extension.getBackgroundPage() === globalThis ? 'background' : 'frame';
+  }
+  else return !extension || !extension.onMessage ? 'page' : 'content';
+})();
+
+let origin = env !== 'page' && browser.runtime.getURL('').replace(/\/+$/, '')
+
+function uuid() {
+  return crypto.getRandomValues(new Uint8Array(16)).join('');
+}
+
+var EXT = globalThis.EXT = {
+  _messageHandlers: {},
+  _messageRequests: {},
+  _framePorts: {},
+  _frame: uuid(),
+  ports: {},
+  environment: env,
+  addMessageHandlers(handlers){
+    Object.assign(EXT._messageHandlers, handlers);
+  },
+  removeMessageHandlers(){
+    for (let handler of arguments) delete EXT._messageHandlers[handler];
+  },
+  messageBackground(message){
+    connectBackground();
+    EXT.backgroundPort.postMessage(message);
+  },
+  sendMessage(config = {}, port = null){
+    /*
+        message = {
+          id: uuid(),
+          frame: FRAME_NAME,
+          type: 'prompt',
+          to: 'background'
+          props: {...},
+          callback: function(){}
+        }
+    */
+    let message = Object.assign({
+      id: uuid(),
+      origin: env
+    }, config, { from: env });
+
+    if (message.callback || message.error) {
+      EXT._messageRequests[message.id] = {
+        callback: message.callback,
+        error: message.error
+      }
+      delete message.callback;
+      delete message.error;
+    }
+    if (env === 'page') {
+      postMessage(JSON.stringify(message), '*');
+    }
+    else if (env === 'frame'){
+      message.frame = globalThis.name;
+      if (message.to === 'page' || message.to === 'content') {
+        browser.tabs.getCurrent().then(tab => {
+          let port = browser.tabs.connect(tab.id);
+          port.onMessage.addListener(message => handleMessage(message))
+          port.postMessage(message);
+        });
+      }
+      else if (message.to === 'background') EXT.messageBackground(message);
+      // else throw `This context has no associated ${message.to} environment to message`;   
+    }
+    else if (env === 'content') {
+      
+      message.source = JSON.parse(JSON.stringify(location));
+      if (message.to === 'page') {
+        message.untrusted = false;
+        postMessage(JSON.stringify(message), '*');
+      }
+      else if (message.to === 'background') EXT.messageBackground(message);
+      else if (message.to === 'frame' && message.frame) {
+        let port = EXT._framePorts[message.frame];
+        if (!port) port = EXT._framePorts[message.frame] = [];
+        Array.isArray(port) ? port.push(message) : port.postMessage(message);
+      }
+    }
+    else if (env === 'background') {
+      if (port) port.postMessage(message);
+      else {
+        for (let id in EXT.ports) {
+          EXT.ports[id].postMessage(message);
+        }
+      }
+    }
+    else EXT.messageBackground(message);
+  }
+};
+
+
+
+EXT.self = new Promise(resolve => {
+  if (env === 'page') return resolve(null);
+  EXT.sendMessage({
+    type: 'get_self',
+    to: 'background',
+    callback: tab => resolve(tab)
+  });
+});
+
+function connectBackground(){
+  if (!EXT.backgroundPort) {  
+    EXT.backgroundPort = browser.runtime.connect();
+    EXT.sendMessage({ type: 'connect-content-port', to: 'background' });
+  }
+}
+
+async function handleMessage(message, port){
+  if (message.origin !== env) { // Not a callback
+    if (message.to === env) { // The message is intended for this environment
+      let handler = EXT._messageHandlers[message.type];
+      if (handler) {
+        try {
+          if (message.untrusted && !handler.untrusted) throw 'Access Denied: message from disallowed context';
+          if (handler.action) {
+            message.response = await handler.action(message, port || null);
+          }
+        }
+        catch (e) { message._error = e }
+      }
+      message.to = message.origin;
+      EXT.sendMessage(message, port || null);
+    }
+  }
+  else { // Is a callback
+    let request = EXT._messageRequests[message.id];
+    if (request && message.origin === env) { // The callback is for this environment
+      if (message._error) {
+        if (request.error) request.error(message._error)
+      }
+      else if (request.callback) request.callback(message.response);
+      delete EXT._messageRequests[message.id];
+    }
+  }
+}
+
+function parseJSON(z) {
+  try { var json = JSON.parse(z || null) } catch(e) {}
+  return json;
+}
+
+switch (env) {
+  case 'page':
+
+      globalThis.addEventListener('message', function(e) {
+        let message = parseJSON(e.data);
+        if (message && e.source === globalThis){
+          if (message.from !== 'page') handleMessage(message);
+        }
+      });
+
+      break;
+
+  case 'frame':
+  case 'content':
+
+      connectBackground();
+      
+      EXT.backgroundPort.onMessage.addListener((message, port) => handleMessage(message, port));
+
+      browser.runtime.onConnect.addListener(port => {
+        port.onMessage.addListener((message, port) => handleMessage(message, port));
+      })
+
+  case 'content':
+
+      globalThis.addEventListener('message', function(e) {
+        let message = parseJSON(e.data);
+        if (message) {
+          if (e.source === globalThis || e.source === globalThis.parent) {
+            message.from = 'page';
+            message.untrusted = true;
+            handleMessage(message);
+          }
+          if (e.source === globalThis && env === 'content' && message.to === 'background') {
+            EXT.sendMessage(message);
+          }
+        }
+        
+      });
+
+      EXT.addMessageHandlers({
+        'connect_frame': {
+          action: (message, port) => {
+            let messages = EXT._framePorts[message.frame];
+            EXT._framePorts[message.frame] = port;
+            if (messages) messages.forEach(m => EXT.sendMessage(m));
+          }
+        },
+      });
+  
+  case 'frame':
+    
+      if (globalThis !== globalThis.top){
+        EXT.sendMessage({
+          type: 'connect_frame',
+          to: 'content',
+          props: {
+            id: window.name
+          },
+          error: error => console.log(error)
+        });
+      }
+
+      break;
+
+  case 'background':
+
+      EXT.addMessageHandlers({
+        'get_self': {
+          action: (message, sender) => sender
+        }
+      });
+  
+      browser.runtime.onConnect.addListener(port => {
+        let id = port.sender.frameId;
+        EXT.ports[id] = port;
+        port.onMessage.addListener((message, port) => handleMessage(message, port));
+        port.onDisconnect.addListener(() => delete EXT.ports[id])
+      });
+
+      break;
+}
+
+})();;  
+  // check to see if executing in a page script
+
+var PE = {
+  "submission_requirements": [
+    {
+      "name": "Banking Information",
+      "purpose": "We need to know if you have an established banking history.",
+      "rule": "pick",
+      "count": 1,
+      "from": "A"
+    },
+    {
+      "name": "Employment Information",
+      "purpose": "We need to know that you are currently employed.",
+      "rule": "all",
+      "from": "B"
+    },
+    {
+      "name": "Citizenship Information",
+      "rule": "pick",
+      "count": 1,
+      "from": "C"
+    }
+  ],
+  "input_descriptors": [
+    {
+      "id": "banking_input_1",
+      "group": ["A"],
+      "schema": {
+        "uri": ["https://bank-standards.com/customer.json"],
+        "name": "Bank Account Information",
+        "purpose": "We need your bank and account information."
+      },
+      "constraints": {
+        "limit_disclosure": true,
+        "fields": [
+          {
+            "path": ["$.issuer", "$.vc.issuer", "$.iss"],
+            "purpose": "The credential must be from one of the specified issuers",
+            "filter": {
+              "type": "string",
+              "pattern": "did:example:123|did:example:456"
+            }
+          },
+          {
+            "path": ["$.credentialSubject.account[*].account_number", "$.vc.credentialSubject.account[*].account_number", "$.account[*].account_number"],
+            "purpose": "We need your bank account number for processing purposes",
+            "filter": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 12
+            }
+          },
+          {
+            "path": ["$.credentialSubject.account[*].routing_number", "$.vc.credentialSubject.account[*].routing_number", "$.account[*].routing_number"],
+            "purpose": "You must have an account with a German, US, or Japanese bank account",
+            "filter": {
+              "type": "string",
+              "pattern": "^DE|^US|^JP"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "banking_input_2",
+      "group": ["A"],
+      "schema": {
+        "uri": [
+          "https://bank-schemas.org/1.0.0/accounts.json",
+          "https://bank-schemas.org/2.0.0/accounts.json"
+        ],
+        "name": "Bank Account Information",
+        "purpose": "We need your bank and account information."
+      },
+      "constraints": {
+        "fields": [
+          {
+            "path": ["$.issuer", "$.vc.issuer", "$.iss"],
+            "purpose": "The credential must be from one of the specified issuers",
+            "filter": {
+              "type": "string",
+              "pattern": "did:example:123|did:example:456"
+            }
+          },
+          { 
+            "path": ["$.credentialSubject.account[*].id", "$.vc.credentialSubject.account[*].id", "$.account[*].id"],
+            "purpose": "We need your bank account number for processing purposes",
+            "filter": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 12
+            }
+          },
+          {
+            "path": ["$.credentialSubject.account[*].route", "$.vc.credentialSubject.account[*].route", "$.account[*].route"],
+            "purpose": "You must have an account with a German, US, or Japanese bank account",
+            "filter": {
+              "type": "string",
+              "pattern": "^DE|^US|^JP"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "employment_input",
+      "group": ["B"],
+      "schema": {
+        "uri": ["https://business-standards.org/schemas/employment-history.json"],
+        "name": "Employment History",
+        "purpose": "We need to know your work history."
+      },
+      "constraints": {
+        "fields": [
+          {
+            "path": ["$.jobs[*].active"],
+            "filter": {
+              "type": "boolean",
+              "pattern": "true"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "citizenship_input_1",
+      "group": ["C"],
+      "schema": {
+        "uri": ["https://eu.com/claims/DriversLicense.json"],
+        "name": "EU Driver's License"
+      },
+      "constraints": {
+        "fields": [
+          {
+            "path": ["$.issuer", "$.vc.issuer", "$.iss"],
+            "purpose": "The credential must be from one of the specified issuers",
+            "filter": {
+              "type": "string",
+              "pattern": "did:example:gov1|did:example:gov2"
+            }
+          },
+          {
+            "path": ["$.credentialSubject.dob", "$.vc.credentialSubject.dob", "$.dob"],
+            "filter": {
+              "type": "string",
+              "format": "date",
+              "minimum": "1999-5-16"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "citizenship_input_2",
+      "group": ["C"],
+      "schema": {
+        "uri": ["hub://did:foo:123/Collections/schema.us.gov/passport.json"],
+        "name": "US Passport"
+      },
+      "constraints": {
+        "fields": [
+          {
+            "path": ["$.credentialSubject.birth_date", "$.vc.credentialSubject.birth_date", "$.birth_date"],
+            "filter": {
+              "type": "string",
+              "format": "date",
+              "minimum": "1999-5-16"
+            }
+          }
+        ]
+      }
+    }
+  ]
+};
+
+(function(){
+
+  // function mapDescriptorById(type, ddo){
+  //   let obj = {};
+  //   if (!ddo[type]) (Array.isArray(ddo[type]) ? ddo[type] : [ddo[type]]).forEach(z => {
+  //     obj[z.id.split('#').pop()] = z
+  //   });
+  //   return obj;
+  // }
+
+  // class DIDDocumentResult {
+  //   constructor (did, src){
+  //     this.did = did;
+  //     this.resolverData = src;
+  //     this.document = src.didDocument;
+  //     this.keys = mapDescriptorById('publicKey', this.document);
+  //     this.services = mapDescriptorById('services', this.document);
+  //   }
+  // };
+
+
+  // ['page', 'frame', 'content', 'background'].forEach(env => {
+  //   let message = env + '_to_' + EXT.environment;
+  //   if (env !== EXT.environment) {
+  //     EXT.addMessageHandlers({
+  //       [message]: {
+  //         untrusted: true,
+  //         action: (props) => {
+  //           console.log(message + ' message handled');
+  //           return message + ' callback sent to ' + env;
+  //         }
+  //       }
+  //     });
+  //   }
+  // });
+
+  //window.addEventListener('click', e => {
+
+  //   ['page', 'frame', 'content', 'background'].forEach(env => {
+  //     [true, false].forEach(untrusted => {
+  //       let message = EXT.environment + '_to_' + env + (untrusted ? '' : '_block');
+  //       if (env !== EXT.environment) {
+  //         EXT.sendMessage({
+  //           type: message,
+  //           to: env,
+  //           callback: response => {
+
+  //             console.log(message + ' callback arrived at ' + EXT.environment)
+  //           },
+  //           error: error => {
+  //             console.log(error)
+  //           }
+  //         });   
+  //       }
+  //     });
+  //   });
+  // });
+
+  if (!navigator.did) {
+
+    if (EXT.environment === 'page') {
+
+      ['page', 'frame', 'content', 'background'].forEach(env => {
+        let message = env + '_to_' + EXT.environment;
+        if (env !== EXT.environment) {
+          EXT.addMessageHandlers({
+            [message]: {
+              untrusted: true,
+              action: (message) => {
+                console.log(message + ' message handled');
+                return message + ' callback sent to ' + env;
+              }
+            }
+          });
+        }
+      });
+
+      EXT.addMessageHandlers({
+        'sidebar_close': (message) => {
+          console.log('page sidebar_close', message.props);
+          return 'sidebar_close from page handler';
+        }
+      });
+
+      Navigator.prototype.did = {
+        resolve (did){
+          //return invokeIntent('resolveDID', did);
+        },
+        configuration (){
+          //return invokeIntent('getDIDConfiguration');
+        },
+        authenticate (props = {}){
+          //return invokeIntent('authenticateDID', props);
+        },
+        requestDid (nonce){
+          return new Promise ((resolve, reject) => {
+            if (!nonce) return reject('DataError: required nonce parameter is missing');
+            EXT.sendMessage({
+              type: 'did_request',
+              to: 'content',
+              props: {
+                nonce: nonce
+              },
+              callback: response => {
+                console.log(response);
+                resolve(response);
+              },
+              error: error => reject(error)
+            });
+          })
+        },
+        requestCredentials (presentationDefinition = PE){
+          return new Promise ((resolve, reject) => {
+            EXT.sendMessage({
+              type: 'credential_request',
+              to: 'content',
+              props: {
+                presentation_definition: PE
+              },
+              callback: response => {
+                console.log('requestCredentials callback');
+                resolve(response);
+              },
+              error: error => {
+                reject(error);
+              }
+            });
+          })
+        }
+
+      };
+    }
+    else {
+
+      // const unlinkedDID = 'Domain invoked authentication with a DID that failed configuration verification';
+      // const RESOLVER_ENDPOINT = null; //'http://localhost:3000/1.0/identifiers/';
+
+      // registerIntent({
+      //   'resolveDID': did => {
+      //     return fetch((RESOLVER_ENDPOINT || 'https://beta.discover.did.microsoft.com/1.0/identifiers/') + did)
+      //       .then(async response => new DIDDocumentResult(did, await response.json()))
+      //       .catch(e => console.log(e));
+      //   },
+      //   'authenticateDID': (props = {}) => {
+      //     return invokeIntent('getDIDConfiguration').then(async config => {
+      //       let entry = config.entries && config.entries[props.did];
+      //       if (!entry) throw unlinkedDID;
+      //       await invokeIntent('resolveDID', props.did).then(async ddo => {
+      //         if (!props.mode) { // assume in-browser UI if no alternate mode declared
+      //           return await invokeIntent('openAuthTab')
+      //                           .then(tab => authTab = tab)
+      //                           .catch(e => console.log(e))
+      //         }
+      //       });
+      //     }).catch(e => {
+      //       console.log(e);
+      //     })
+      //   },
+      //   'presentationDefinitionPrompt': (props = {}) => {
+      //     return invokeIntent('popup', props).then(async config => {
+            
+      //     }).catch(e => {
+      //       console.log(e);
+      //     })
+      //   }
+      // })
+
+    }
+  }
+
+})(); }).toString() + ')()';
+        document.documentElement.prepend(pageScript);
+        
+(async function(){
+
+  const root = document.documentElement;
+  const {default: DOM} = await import('/extension/js/modules/dom.js');
+  const {default: DID} = await import('/extension/js/modules/did.js');
+  const {default: Storage} = await import('/extension/js/modules/storage.js');
+  const {default: ExtensionFrame} = await import('/extension/js/modules/extension-frame.js');
+
+  var sidebarInstance;
+  var sidebarOpen = false;
+
+  function openSidebar(options = {}){
+    if (sidebarOpen) {
+      throw 'OperationError: DID interaction in progress, cannot initiate another unil the previous interaction is finished';
+    }
+    sidebarInstance = sidebarInstance || new ExtensionFrame({
+      classes: 'did-extension-sidebar',
+      onLoad(sidebar){
+        if (options.onLoad) options.onLoad(sidebar);
+      },
+      onHide(sidebar) {
+        sidebar.src = null;
+        if (root.contains(sidebar.element)) {
+          sidebar.element.parentNode.removeChild(sidebar.element);
+        }
+        sidebarOpen = false;
+        if (options.onHide) options.onHide(sidebar);
+      }
+    });
+    sidebarInstance.src = options.src;
+    root.contains(sidebarInstance.element) || root.appendChild(sidebarInstance.element);
+    DOM.skipAnimationFrame(() => sidebarInstance.show());
+    sidebarOpen = true;
+  }
+
+  function sidebarClose(){
+    if (sidebarInstance) sidebarInstance.hide();
+  }
+
+  EXT.addMessageHandlers({
+    'did_request': {
+      untrusted: true,
+      action: async (message) => {
+        if (message.from !== 'page') return;
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+          throw 'NotAllowedError: DID interactions are only permitted in secure contexts (https, localhost)';
+        }
+        let peer = await DID.getPeer(location.origin);
+        if (peer) {
+          if (peer.permissions.did_request === false) throw 'AbortError: No DID was returned';
+          if (peer.did) return peer.did.uri;
+        }
+        EXT.addMessageHandlers({
+          'did_request_config': {
+            action: () => {
+              return {
+                uri: location.origin,
+                nonce: message.props.nonce
+              }
+            }
+          }
+        });
+        return await new Promise((resolve, reject) => {
+          try {
+            openSidebar({
+              src: '/extension/views/did-request/index.html',
+              onLoad(sidebar) {
+                EXT.addMessageHandlers({
+                  'did_response': {
+                    action: async (message) => {
+                      console.log(message);
+                      if (message.frame == sidebar.name) {
+                        resolve(message.props);
+                        sidebar.hide();
+                        sidebarInstance = null;
+                      }
+                    }
+                  }
+                });
+              },
+              onHide(){
+                reject('AbortError: No DID was returned');
+                sidebarInstance = null;
+              }
+            })
+          }
+          catch (e){ reject(e) }
+        }).finally(() => {
+          EXT.removeMessageHandlers('did_request_config', 'did_response');
+        })
+      }
+    },
+    'credential_request': {
+      untrusted: true,
+      action: (message) => {
+        openSidebar('/extension/views/presentation-exchange/index.html')
+      }
+    },
+    'sidebar_close': {
+      action: (message) => {
+        sidebarClose();
+      }
+    }
+  });
+
+})()
+      

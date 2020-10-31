@@ -1,4 +1,8 @@
 
+
+import '/extension/js/utils.js';
+import Storage from '/extension/js/modules/storage.js';
+
 (function(){
 
   const extensionURL = browser.runtime.getURL('/');

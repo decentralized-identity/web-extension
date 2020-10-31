@@ -1,6 +1,6 @@
 
 
-#did_ua_extension_sidebar {
+.did-extension-sidebar {
   --shadow: 5px;
   contain: strict;
   position: fixed;
@@ -11,10 +11,10 @@
   max-width: 500px;
   border: none;
   transform: translateX(calc(100% + var(--shadow)));
-  transition: transform 0.5s ease;
+  transition: transform 0.4s ease;
   box-shadow: 0 0 var(--shadow) 0px rgba(0,0,0,0.5);
 }
 
-#did_ua_extension_sidebar[open] {
+.did-extension-sidebar[show-did-extension-sidebar] {
   transform: translateX(0%);  
 }

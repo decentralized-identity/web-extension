@@ -4,24 +4,35 @@
   --no-color: 255,255,255;
   --dim-color: 225,225,225;
   --low-color: 200,200,200;
+  --mild-color: 150,150,150;
   --mid-color: 100,100,100;
   --high-color: 50,50,50;
   --full-color: 0,0,0;
-  --active-color: #3aaaff;
+
+  --active-color: 58, 170, 255;
+  --note-color: 255, 247, 203;
+  --success-color: rgb(0, 141, 71);
+  --warning-color: rgb(226, 192, 0);
+  --error-color: rgb(182, 47, 47);
+  --error-color-light: hsl(0, 100%, 85%);
+  --info-color: rgb(0, 93, 155);
 
   --page-bk: rgb(var(--low-color));
   --page-text: rgb(var(--high-color));
   --page-text-hover: rgb(var(--full-color));
+  --page-text-inverse: rgb(var(--no-color));
 
   --element-bk: rgb(var(--dim-color));
   --element-bk-hover: rgba(var(--mid-color), 0.5);
   --element-bk-transparent: rgba(var(--dim-color), 0.92);
+  --element-bk-active: rgba(var(--active-color), 0.6);
   --element-border: rgba(var(--high-color), 0.4);
   --element-border-focus: rgb(var(--full-color), 0.75);
   --element-border-radius: 3px;
   --element-shadow-low: 0 1px 3px 0px rgba(0,0,0, 0.25);
-  --element-shadow-mid: 0 1px 3px 0px rgba(0,0,0, 0.35);
-  --element-shadow-high: 0 1px 5px 0px rgba(0,0,0, 0.45);
+  --element-shadow-mid: 0 1px 3px 0px rgba(0,0,0, 0.5);
+  --element-shadow-high: 0 1px 5px 0px rgba(0,0,0, 0.55);
+  --element-shadow-active: 0 0 3px 3px rgba(var(--active-color), 0.9);
 
   --input-bk: rgba(var(--dim-color), 0.6);
   --input-border: rgba(var(--high-color), 0.4);
@@ -47,7 +58,8 @@
     --no-color: 0,0,0;
     --dim-color: 40,40,40;
     --low-color: 60,60,60;
-    --mid-color: 80,80,80;
+    --mild-color: 75,75,75;
+    --mid-color: 85,85,85;
     --high-color: 200,200,200;
     --full-color: 255,255,255;
 
@@ -56,15 +68,16 @@
 }
 
 html, body {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  height: 100%;
 }
 
 body {
   font-size: var(--font-size);
   color: var(--page-text);
   background: var(--page-bk);
-  overflow-y: scroll;
   scrollbar-color: var(--page-bk) var(--page-text);
 }
 
@@ -128,20 +141,53 @@ h3 {
 
 h4 {
   font-size: 1.2em;
-  font-weight: 400;
+  font-weight: 500;
+}
+
+h5 {
+  font-size: 1em;
+  font-weight: 500;
+  margin: 0 0 0.5em;
+}
+
+hr {
+  height: 0px;
+  margin: 1.75em 0 1.75em;
+  border-color: rgba(var(--full-color), 0.3) transparent transparent;
+  border-radius: 100%;
+  box-shadow: 0 -1px 0px 0px rgba(0,0,0,0.35);
 }
 
 p {
-  margin: 0 0 1.25em;
+  margin: 0 0 1.5em;
 }
 
 button {
-  padding: 0.6em 0.75em;
+  padding: 0.55em 0.75em 0.5em;
   background: #ddd;
   border: none;
   border-radius: 3px;
-  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2);
+  box-shadow: var(--element-shadow-mid);
   cursor: pointer;
+}
+
+button[options~="action"],
+button[options~="cancel"] {
+  color: rgb(var(--full-color));
+  text-shadow: 0 1px 2px rgba(var(--no-color), 0.2);
+} 
+
+button[options~="action"] {
+  background: rgb(var(--active-color));
+} 
+
+button[options~="cancel"] {
+  background: var(--error-color);
+} 
+
+button[options~="icon"] {
+  font-size: 1.25em;
+  padding: 0.3em 0.45em 0.2em;
 }
 
 ul, ol {
@@ -198,7 +244,8 @@ input[type="password"]:focus {
   border: 1px solid var(--element-border-focus);
 }
 
-slide-panels slide-panel {
+slide-panels slide-panel,
+slide-panels slide-panel > section {
   background: var(--page-bk);
 }
 
@@ -244,13 +291,35 @@ modal-overlay header > [modal-close]:hover {
   background: var(--element-bk-hover);
 }
 
+notice-bar > header {
+  font-size: 1.15em;
+  font-weight: 500 !important;
+}
+
+notice-bar[notice-type="success"] {
+  color: #fff;
+  background-color: var(--success-color);
+}
+
+notice-bar[notice-type="warning"] {
+  background-color: var(--warning-color);
+}
+
+notice-bar[notice-type="error"] {
+  color: #fff;
+  background-color: var(--error-color);
+}
+
+notice-bar[notice-type="info"] {
+  color: #fff;
+  background-color: var(--info-color);
+}
+
 main > slide-panels > slide-panel > header {
-  box-sizing: border-box;
-  position: sticky;
+  position: relative;
   top: var(--header-height);
   border-bottom: 1px solid var(--header-border-inverse);
   background: var(--element-bk-transparent);
-
   box-shadow: var(--element-shadow-mid);
 }
 
@@ -271,11 +340,47 @@ main > slide-panels > slide-panel > header > nav {
 
 main > slide-panels > slide-panel > section {
   margin: var(--header-height) 0 0;
-  padding: 2em 1em 2em;
+  padding: 2em 1.4em 2em;
+}
+
+main > slide-panels > slide-panel > section > * {
+  max-width: 825px;
+  margin: 0 auto;
 }
 
 main > slide-panels > slide-panel > header {
   padding: 0 calc(var(--header-height) / 4);
+}
+
+[block],
+[list~="block"] > * {
+  padding: 1.5em 1em 1.25em;
+  background: rgb(var(--mild-color));
+  /* border: 1px solid rgb(var(--dim-color)); */
+  border-radius: var(--element-border-radius);
+  box-shadow: var(--element-shadow-mid);
+}
+
+[list~="block"],
+[toolbar] {
+  display: flex;
+  align-items: center;
+}
+
+[toolbar] > * {
+  margin: auto 0.4em;
+}
+
+[toolbar] > button {
+  height: calc(100% - 2px);
+}
+
+[toolbar] > :first-child {
+  margin-left: 0;
+}
+
+[toolbar] > :last-child {
+  margin-right: 0;
 }
 
 [flex~="left"] {
@@ -295,6 +400,24 @@ main > slide-panels > slide-panel > header {
 [before-content]:before {
   content: attr(before-content);
   display: block;
+}
+
+[banner] {
+  display: flex;
+  align-items: center;
+  padding: 0.75em 1em;
+  background: var(--element-bk-transparent);
+}
+
+  [banner] button {
+    font-size: 90%;
+    margin: 0 0 0 1em;
+    padding: 0.35em 0.5em 0.3em;
+
+  }
+
+[banner~="warning"] {
+  color: var(--error-color-light);
 }
 
 .sidenav {
@@ -352,7 +475,11 @@ main > slide-panels > slide-panel > header {
 }
 
 #global_header nav {
-  padding: 0 0 0 1em;
+  padding: 0 0.5em 0 1em;
+}
+
+#page_notices {
+  z-index: 101;
 }
 
 /*** Layouts ***/

@@ -1,70 +1,49 @@
 
-router.filters = [
+import Router from '/extension/js/modules/router.js';
+
+var panels = {};
+async function initializePanel(panel){
+  if (!panels[panel]) {
+    panels[panel] = await import('./panels/personas.js');
+    await panels[panel].initialize();
+  }
+}
+
+var scrollPositions = {};
+
+Router.filters = [
   {
     path: '/extension/views/dashboard/index.html',
     params: ['view'],
-    listener(newState, oldState){
-      let view = newState.params.view || 'personas';
-      content_panels.open(view);
+    async listener(state, oldState){
+      let lastView = oldState.params.view || 'personas';
+      let currentView = state.params.view || 'personas';
+      switch(currentView){
+        case 'personas':
+          await initializePanel('personas');
+      }
+      content_panels.open(currentView);
+      // let currentScroll = { top: scrollY, left: scrollX };
+      // let scroll = state.scroll = scrollPositions[currentView] = scrollPositions[currentView] || currentScroll;
+      // let lastScroll = scrollPositions[lastView] || {};
+      // if (lastScroll.top !== scroll.top || lastScroll.left !== scroll.left) {
+      //   history.replaceState(oldState, document.title, oldState.search);
+      // }
+      // windowScroll({
+      //   top: scroll.top,
+      //   left: scroll.left,
+      //   behavior: 'smooth'
+      // });
     }
   }
 ];
 
-router.setState(location);
+Router.setState(location);
 
 window.addEventListener('routechange', e => {
   if (overlay_panels) overlay_panels.close();
 });
 
-(async () => {
-
-const extensionURL = browser.runtime.getURL('/');
-const iconClasses = await fetch(extensionURL + 'extension/data/font-awesome-personas.json')
-                          .then(response => response.json());
-
-persona_create_modal_icons.innerHTML = '<i class="' + iconClasses.join('"></i><i class="') + '"></i>';
-
-delegateEvent('pointerup', '[view-action="close"]', e => {
-  console.log(e.path);
-  EXT.sendMessage({
-    type: 'sidebar_close',
-    to: 'content',
-    callback: response => {
-      
-    },
-    error: error => {
-      console.log(error)
-    }
-  });
+nav_toggle.addEventListener('pointerup', e => {
+  overlay_panels.open('nav');
 });
-
-delegateEvent('keypress', '.global-search', e => {
-  if (e.key === 'Enter') {
-    global_search_query.textContent = e.target.value;
-    if(content_panels.active !== 'global_search') {
-      router.modifyState({
-        event: e,
-        params: { view: 'global_search' }
-      });
-    }
-  }
-});
-
-delegateEvent('pointerup', '.create-persona', e => {
-  persona_create_modal.open();
-});
-
-delegateEvent('pointerup', '.persona-selection-list li', e => {
-  persona_create_modal.open();
-});
-
-// persona_create_modal_custom.addEventListener('pointerup', e => {
-//   persona_create_modal_custom_form.open();
-// });
-
-// persona_create_modal.addEventListener('modalclosed', e => {
-//   persona_create_modal_custom_form.close();
-// })
-
-
-})()

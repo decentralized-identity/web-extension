@@ -4,138 +4,143 @@
   <head>
     <meta charset="utf-8">
     <title>DID &amp; Identity Hub Web API</title>
+    <script>
+      
+    </script>
+    <style>
+
+      body {
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        overflow-y: scroll;
+      }
+
+      main {
+        margin: 2em auto 5em;
+        max-width: 600px;
+      }
+
+      section {
+        margin-bottom: 5em;
+      }
+
+      h2 {
+        color: #203e72;
+        border-bottom: 2px solid #aaa;
+      }
+
+      label i,
+      dt i {
+        font-weight: normal;
+        padding-left: 0.3em;
+      }
+
+      button[styled] {
+        padding: 0.8em 1.25em 0.75em;
+        border: none;
+        border-radius: 3px;
+        background: rgb(73, 110, 175);
+        color: #fff;
+        cursor: pointer;
+      }
+
+      button[styled~="center"] {
+        display: block;
+        margin: 0 auto;
+      }
+
+
+      form,
+      form > * {
+        display: block;
+      }
+
+      form label {
+        margin: 0 0 1em;
+      }
+      
+      form label:before {
+        content: attr(text);
+        display: inline-block;
+        font-weight: bold;
+        margin-bottom: 0.3em;
+      }
+
+      form input {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        font-family: Courier;
+      }
+
+      form input[type="number"] {
+        max-width: 3em;
+        font-size: 1.3em;
+      }
+
+      form textarea {
+        box-sizing: border-box;
+        width: 100%;
+        resize: none;
+      }
+
+      #submit_lookup {
+        margin-top: 2em;
+      }
+
+      #result:empty {
+        height: 5em;
+        line-height: 5em;
+        text-align: center;
+      }
+
+      #result:empty:before {
+        content: "Generate a secret above";
+        color: #bbb;
+      }
+
+      #result,
+      #result dd {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      #result dt {
+        display: block;
+        margin: 1em 0 0.3em;
+        font-weight: bold;
+      }
+
+      #result dd {
+        margin: 0 0 1em;
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+      }
+
+      dd data {
+        display: block;
+        padding: 0.75em 0.75em 0.5em;
+        border-top: 1px solid #ccc;
+        word-wrap: break-word;
+        font-size: 1em;
+        font-family: Courier;
+      }
+
+      dd data:first-child {
+        border: none;
+      }
+
+    </style>
+
+
+
+    
+
   </head>
 
-  <style>
-
-    body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      overflow-y: scroll;
-    }
-
-    main {
-      margin: 2em auto 5em;
-      max-width: 600px;
-    }
-
-    section {
-      margin-bottom: 5em;
-    }
-
-    h2 {
-      color: #203e72;
-      border-bottom: 2px solid #aaa;
-    }
-
-    label i,
-    dt i {
-      font-weight: normal;
-      padding-left: 0.3em;
-    }
-
-    button[styled] {
-      padding: 0.8em 1.25em 0.75em;
-      border: none;
-      border-radius: 3px;
-      background: rgb(73, 110, 175);
-      color: #fff;
-      cursor: pointer;
-    }
-
-    button[styled~="center"] {
-      display: block;
-      margin: 0 auto;
-    }
-
-
-    form,
-    form > * {
-      display: block;
-    }
-
-    form label {
-      margin: 0 0 1em;
-    }
-    
-    form label:before {
-      content: attr(text);
-      display: inline-block;
-      font-weight: bold;
-      margin-bottom: 0.3em;
-    }
-
-    form input {
-      display: block;
-      box-sizing: border-box;
-      width: 100%;
-      font-family: Courier;
-    }
-
-    form input[type="number"] {
-      max-width: 3em;
-      font-size: 1.3em;
-    }
-
-    form textarea {
-      box-sizing: border-box;
-      width: 100%;
-      resize: none;
-    }
-
-    #submit_lookup {
-      margin-top: 2em;
-    }
-
-    #result:empty {
-      height: 5em;
-      line-height: 5em;
-      text-align: center;
-    }
-
-    #result:empty:before {
-      content: "Generate a secret above";
-      color: #bbb;
-    }
-
-    #result,
-    #result dd {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    #result dt {
-      display: block;
-      margin: 1em 0 0.3em;
-      font-weight: bold;
-    }
-
-    #result dd {
-      margin: 0 0 1em;
-      background: #f0f0f0;
-      border: 1px solid #ddd;
-      border-radius: 3px;
-    }
-
-    dd data {
-      display: block;
-      padding: 0.75em 0.75em 0.5em;
-      border-top: 1px solid #ccc;
-      word-wrap: break-word;
-      font-size: 1em;
-      font-family: Courier;
-    }
-
-    dd data:first-child {
-      border: none;
-    }
-
-  </style>
-
-
-
-
 <body>
+
 
   <main>
 
@@ -176,7 +181,7 @@
 </body>
 
 <script>
-
+  
 document.addEventListener('DOMContentLoaded', function(){
   var input = did_lookup_form.elements.did_lookup_input;
   input.value = localStorage.did_lookup_input || input.value;
@@ -213,5 +218,6 @@ did_request_form.addEventListener('submit', function(e){
 });
 
 </script>
+
 
 </html>

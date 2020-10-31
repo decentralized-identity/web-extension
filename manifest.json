@@ -28,8 +28,10 @@
   "web_accessible_resources": [
     "fonts/*",
     "extension/css/pages.css",
+    "extension/js/modules/*",
+    "extension/js/polyfills/*",
     "extension/js/utils.js",
-    "extension/js/polyfills/navigator.js", 
+    "extension/js/content.js", 
     "extension/views/*"
   ],
 
@@ -49,11 +51,7 @@
 
   "background": {
     "persistent": true,
-    "scripts": [
-      "extension/js/polyfills/web-extension-polyfill.js",
-      "extension/js/utils.js",
-      "extension/js/background.js"
-    ]
+    "page": "extension/background-page.html"
   },
 
   "content_scripts": [
@@ -65,10 +63,9 @@
         "extension/css/pages.css"
       ],
       "js": [
-        "extension/js/polyfills/web-extension-polyfill.js",
-        "extension/js/anime.min.js",
+        "extension/js/polyfills/web-extensions.js",
         "extension/js/utils.js",
-        "extension/js/content.js"       
+        "extension/js/compiled/content.js"
       ]
     }
   ]
