@@ -237,21 +237,6 @@ var PE = {
 
     if (EXT.environment === 'page') {
 
-      ['page', 'frame', 'content', 'background'].forEach(env => {
-        let message = env + '_to_' + EXT.environment;
-        if (env !== EXT.environment) {
-          EXT.addMessageHandlers({
-            [message]: {
-              untrusted: true,
-              action: (message) => {
-                console.log(message + ' message handled');
-                return message + ' callback sent to ' + env;
-              }
-            }
-          });
-        }
-      });
-
       EXT.addMessageHandlers({
         'sidebar_close': (message) => {
           console.log('page sidebar_close', message.props);
@@ -260,8 +245,12 @@ var PE = {
       });
 
       Navigator.prototype.did = {
-        resolve (did){
-          //return invokeIntent('resolveDID', did);
+        async resolve (did) { // EXAMPLE: did:btcr:x705-jznz-q3nl-srs
+          return EXT.request({
+            type: 'did_resolution',
+            to: 'content',
+            props: { did: did }
+          })
         },
         configuration (){
           //return invokeIntent('getDIDConfiguration');
@@ -269,22 +258,15 @@ var PE = {
         authenticate (props = {}){
           //return invokeIntent('authenticateDID', props);
         },
-        requestDid (nonce){
-          return new Promise ((resolve, reject) => {
-            if (!nonce) return reject('DataError: required nonce parameter is missing');
-            EXT.sendMessage({
-              type: 'did_request',
-              to: 'content',
-              props: {
-                nonce: nonce
-              },
-              callback: response => {
-                console.log(response);
-                resolve(response);
-              },
-              error: error => reject(error)
-            });
-          })
+        async requestDid (nonce){
+          if (!nonce) throw 'DataError: required nonce parameter is missing';
+          return EXT.request({
+            type: 'did_request',
+            to: 'content',
+            props: {
+              nonce: nonce
+            }
+          });
         },
         requestCredentials (presentationDefinition = PE){
           return new Promise ((resolve, reject) => {

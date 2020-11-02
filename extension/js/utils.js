@@ -94,6 +94,18 @@ var EXT = globalThis.EXT = {
       }
     }
     else EXT.messageBackground(message);
+  },
+  request (options = {}){
+    return new Promise((resolve, reject) => {
+      EXT.sendMessage(Object.assign(options, {
+        callback (){
+          resolve(...arguments);
+        },
+        error (){
+          reject(...arguments);
+        }
+      }));
+    });
   }
 };
 

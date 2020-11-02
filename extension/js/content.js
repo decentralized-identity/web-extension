@@ -39,6 +39,12 @@
   }
 
   EXT.addMessageHandlers({
+    'did_resolution': {
+      untrusted: true,
+      action: async (message) => {
+        return await fetch('https://resolver.identity.foundation/1.0/identifiers/' + message.props.did).then(res => res.json());
+      }
+    },
     'did_request': {
       untrusted: true,
       action: async (message) => {
