@@ -233,7 +233,7 @@ var PE = {
   //   });
   // });
 
-  if (!navigator.did) {
+  if (!navigator.did || !navigator.did.dev) {
 
     if (EXT.environment === 'page') {
 
@@ -244,86 +244,65 @@ var PE = {
         }
       });
 
-      Navigator.prototype.did = {
-        async resolve (did) { // EXAMPLE: did:btcr:x705-jznz-q3nl-srs
-          return EXT.request({
-            type: 'did_resolution',
-            to: 'content',
-            props: { did: did }
-          })
-        },
-        configuration (){
-          //return invokeIntent('getDIDConfiguration');
-        },
-        authenticate (props = {}){
-          //return invokeIntent('authenticateDID', props);
-        },
-        async requestDid (nonce){
-          if (!nonce) throw 'DataError: required nonce parameter is missing';
-          return EXT.request({
-            type: 'did_request',
-            to: 'content',
-            props: {
-              nonce: nonce
-            }
-          });
-        },
-        requestCredentials (presentationDefinition = PE){
-          return new Promise ((resolve, reject) => {
-            EXT.sendMessage({
-              type: 'credential_request',
+      let didInterfaces = {
+        dev: {
+          async resolve (did) { // EXAMPLE: did:btcr:x705-jznz-q3nl-srs
+            return EXT.request({
+              type: 'did_resolution',
+              to: 'content',
+              props: { did: did }
+            })
+          },
+          configuration (){
+            
+          },
+          authenticate (props = {}){
+            
+          },
+          async requestDid (nonce){
+            if (!nonce) throw 'DataError: required nonce parameter is missing';
+            return EXT.request({
+              type: 'did_request',
               to: 'content',
               props: {
-                presentation_definition: PE
-              },
-              callback: response => {
-                console.log('requestCredentials callback');
-                resolve(response);
-              },
-              error: error => {
-                reject(error);
+                nonce: nonce
               }
             });
-          })
+          },
+          requestCredentials (presentationDefinition = PE){
+            return new Promise ((resolve, reject) => {
+              EXT.sendMessage({
+                type: 'credential_request',
+                to: 'content',
+                props: {
+                  presentation_definition: PE
+                },
+                callback: response => {
+                  console.log('requestCredentials callback');
+                  resolve(response);
+                },
+                error: error => {
+                  reject(error);
+                }
+              });
+            })
+          }
         }
-
       };
-    }
-    else {
 
-      // const unlinkedDID = 'Domain invoked authentication with a DID that failed configuration verification';
-      // const RESOLVER_ENDPOINT = null; //'http://localhost:3000/1.0/identifiers/';
-
-      // registerIntent({
-      //   'resolveDID': did => {
-      //     return fetch((RESOLVER_ENDPOINT || 'https://beta.discover.did.microsoft.com/1.0/identifiers/') + did)
-      //       .then(async response => new DIDDocumentResult(did, await response.json()))
-      //       .catch(e => console.log(e));
-      //   },
-      //   'authenticateDID': (props = {}) => {
-      //     return invokeIntent('getDIDConfiguration').then(async config => {
-      //       let entry = config.entries && config.entries[props.did];
-      //       if (!entry) throw unlinkedDID;
-      //       await invokeIntent('resolveDID', props.did).then(async ddo => {
-      //         if (!props.mode) { // assume in-browser UI if no alternate mode declared
-      //           return await invokeIntent('openAuthTab')
-      //                           .then(tab => authTab = tab)
-      //                           .catch(e => console.log(e))
-      //         }
-      //       });
-      //     }).catch(e => {
-      //       console.log(e);
-      //     })
-      //   },
-      //   'presentationDefinitionPrompt': (props = {}) => {
-      //     return invokeIntent('popup', props).then(async config => {
-            
-      //     }).catch(e => {
-      //       console.log(e);
-      //     })
-      //   }
-      // })
-
+      if (!navigator.did) {
+        Navigator.prototype.did = didInterfaces;
+      }
+      else if (!navigator.did.dev) {
+        for (let interface in didInterfaces) {
+          if (!Navigator.prototype.did[interface]) {
+            Object.defineProperty(Navigator.prototype.did, interface, {
+              enumerable: true,
+              value: didInterfaces[interface]
+            })
+          }
+        }
+      }
     }
   }
 

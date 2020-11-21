@@ -13,6 +13,11 @@
     "koa-body": "2.5.0",
     "webextension-polyfill": "0.6.0",
     "gulp": "4.0.2",
-    "fs-extra": "9.0.1"
+    "fs-extra": "9.0.1",
+    "dompurify": "2.2.2",
+    "jsonld": "3.2.0",
+    "jsonpath-plus": "4.0.0",
+    "jshashes": "1.0.8",
+    "dexie": "3.0.2"
   }
 }

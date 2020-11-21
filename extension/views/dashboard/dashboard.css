@@ -65,6 +65,42 @@ main > slide-panels > slide-panel:not([open]) {
   transform: scale(0.995);
 }
 
+.render-list-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.render-list[empty] + nav {
+  display: none;
+}
+
+.render-list + nav {
+  order: -1;
+  margin: 0 0 2em;
+}
+
+.no-panel-content {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  max-width: 400px;
+  margin: 3em auto 0;
+  text-align: center;
+}
+
+.render-list[empty] *:not(.no-panel-content) {
+  display: none;
+}
+
+.render-list[empty] ~ .no-panel-content {
+  display: flex;
+}
+
+.no-panel-content > .fas {
+  font-size: 8em;
+}
+
 /* Personas Panel */
 
 #personas .test-block {
@@ -90,11 +126,6 @@ main > slide-panels > slide-panel:not([open]) {
 
 /*** PERSONA DIDs ***/
 
-#persona_dids {
-  display: flex;
-  flex-direction: column;
-}
-
 #persona_did_nav {
   order: -1;
   margin: 0 0 2em;
@@ -104,10 +135,6 @@ main > slide-panels > slide-panel:not([open]) {
   white-space: nowrap;
 }
 
-#persona_did_list:empty + #peer_did_list:empty ~ #persona_did_nav {
-  display: none;
-}
-
 /* #persona_did_list > div {
   transition: transform 0.3s ease;
 }
@@ -115,24 +142,6 @@ main > slide-panels > slide-panel:not([open]) {
 #persona_did_list > div:hover {
   transform: scale(1.05);
 } */
-
-#no_personas {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-items: center;
-  max-width: 400px;
-  margin: 3em auto 0;
-  text-align: center;
-}
-
-#persona_did_list:empty ~ #no_personas {
-  display: flex;
-}
-
-#no_personas > .fa-users {
-  font-size: 8em;
-}
 
 @media (max-width: 699px) {
   main {
@@ -150,7 +159,7 @@ main > slide-panels > slide-panel:not([open]) {
 
   /* Persona Create Modal */
 
-  #persona_create_modal > section {
+  #persona_create_modal > article {
     max-width: 500px;
   }
 
@@ -195,3 +204,30 @@ main > slide-panels > slide-panel:not([open]) {
     border-radius: 3px;
     overflow: auto;
   }
+
+  /* Connections */
+
+  #connections_content {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #connections_nav {
+    order: -1;
+    margin: 0 0 2em;
+  }
+
+  #connections_list:empty ~ #connections_nav {
+    display: none;
+  }
+
+  #connections_list:empty ~ .no-panel-content {
+    display: flex;
+  }
+
+
+/* DATA & CREDENTIALS */
+
+#data_viewer article {
+  max-width: 700px;
+}

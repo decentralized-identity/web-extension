@@ -60,6 +60,7 @@
     --low-color: 60,60,60;
     --mild-color: 75,75,75;
     --mid-color: 85,85,85;
+    --more-color: 135,135,135;
     --high-color: 200,200,200;
     --full-color: 255,255,255;
 
@@ -187,7 +188,7 @@ button[options~="cancel"] {
 
 button[options~="icon"] {
   font-size: 1.25em;
-  padding: 0.3em 0.45em 0.2em;
+  padding: 0.4em 0.4em 0.3em;
 }
 
 ul, ol {
@@ -244,6 +245,8 @@ input[type="password"]:focus {
   border: 1px solid var(--element-border-focus);
 }
 
+/* SLIDE-PANELS */
+
 slide-panels slide-panel,
 slide-panels slide-panel > section {
   background: var(--page-bk);
@@ -260,19 +263,20 @@ slide-panel > header > * {
   margin: 0;
 }
 
+/* MODAL-OVERLAY */
+
 modal-overlay {
   padding: 1em;
   z-index: 101;
 }
 
-modal-overlay > section {
-  padding: 1em 1.2em;
+modal-overlay > article {
   background: var(--header-bk);
   border-radius: var(--element-border-radius);
   box-shadow: var(--element-shadow-high);
 }
 
-modal-overlay > section > header {
+modal-overlay > article > header {
   color: var(--page-text-hover);
 }
 
@@ -290,6 +294,20 @@ modal-overlay header > [modal-close] {
 modal-overlay header > [modal-close]:hover {
   background: var(--element-bk-hover);
 }
+
+modal-overlay > article > footer > * {
+  margin: 0 1em;
+}
+
+modal-overlay > article > footer > *:first-child {
+  margin: 0 0.4em 0 0;
+}
+
+modal-overlay > article > footer > *:last-child {
+  margin: 0 0 0 0.4em;
+}
+
+/* NOTICE-BAR */
 
 notice-bar > header {
   font-size: 1.15em;
@@ -313,6 +331,34 @@ notice-bar[notice-type="error"] {
 notice-bar[notice-type="info"] {
   color: #fff;
   background-color: var(--info-color);
+}
+
+/* TAB-PANELS */
+
+tab-panels > nav > * {
+  background: var(--element-bk);
+}
+
+tab-panels > nav > *:focus {
+  outline: none;
+  background: #ccc;
+}
+
+tab-panels > nav > *[selected] {
+  color: var(--full-color);
+  background: var(--element-bk-active);
+  border-color: #004c8a;
+}
+
+/* TAB-PANELS */
+
+data-browser li > i {
+  font-size: 1.5em;
+  margin-right: 0.25em;
+}
+
+data-browser li > * {
+  vertical-align: middle;
 }
 
 main > slide-panels > slide-panel > header {
@@ -365,6 +411,11 @@ main > slide-panels > slide-panel > header {
 [toolbar] {
   display: flex;
   align-items: center;
+}
+
+[list~="rows"] > * {
+  padding: 0.65em 0.55em 0.7em;
+  border-top: 1px solid var(--element-border);
 }
 
 [toolbar] > * {
@@ -454,6 +505,12 @@ main > slide-panels > slide-panel > header {
   margin-right: 0.75em;
 }
 
+/* SEMANTIC DATA VIEW */
+
+.semantic-data-container {
+  max-width: 700px;
+}
+
 #nav_toggle {
   height: var(--header-height);
   min-width: calc(var(--header-height) - 0.5em);
@@ -491,7 +548,7 @@ main > slide-panels > slide-panel > header {
 
 }
 
-@media (min-width: 700px) {
+@media (min-width: 699px) {
   #nav {
     transform: none;
   }

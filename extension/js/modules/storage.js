@@ -1,37 +1,51 @@
 
 import Natives from '/extension/js/modules/natives.js';
+import Dexie from '/extension/js/modules/dexie.js';
 
-var storage = browser.storage.sync;
+var storage = browser.storage.local;
+
+const db = new Dexie('DIDWebExtension');
+
+db.version(1).stores({
+  personas: 'id',
+  connections: 'id,did',
+  data: 'id,type,origin',
+  apps: 'id'
+});
+
 var storageMethods = {
-  get (key){
-    return storage.get(key).then(obj => obj[key]);
+  query (store, keys){
+    return db[store].where(keys);
   },
-  getAll (keys){
-    return storage.get(Array.isArray(keys) ? keys : arguments);
+  get (store, id){
+    return db[store].get(id);
   },
-  set (key, value){
-    let item = key;
-    if (arguments.length > 1) item = { [key]: value };
-    return storage.set(item);
+  getAll (store){
+    return db[store].toArray();
   },
-  assign(key, newObj){
-    return this.get(key).then(currentObj => {
-      this.set(key, Object.assign(currentObj || {}, newObj));
+  set (store, obj, id){
+    return db[store].put(obj, id);
+  },
+  spray (store, objects){
+    return db[store].bulkPut(objects);
+  },
+  remove (store, id){
+    return db[store].delete(id);
+  },
+  clear (store) {
+    return db[store].clear();
+  },
+  async modify (store, id, fn){
+    return this.get(store, id).then(async entry => {
+      let obj = entry || {};
+      let result = await fn(obj, !!entry) || obj;
+      return this.set(store, result);
     })
   },
-  merge(key, newObj){
-    return this.get(key).then(currentObj => {
-      this.set(key, Natives.merge(currentObj || {}, newObj));
+  async merge (store, id, changes){
+    return this.get(store, id).then((entry = {}) => {
+      return this.set(store, id, Natives.merge(entry, changes));
     })
-  },
-  contains (key){
-    return this.get(key).then(o => !!Object.keys(o).length);
-  },
-  remove (keys){
-    return storage.remove(Array.isArray(keys) ? keys : arguments.length > 1 ? arguments : keys);
-  },
-  clear() {
-    return storage.clear();
   }
 }
 

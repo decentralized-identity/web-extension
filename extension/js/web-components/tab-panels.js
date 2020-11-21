@@ -5,7 +5,7 @@ import DOM from '/extension/js/modules/dom.js';
 class TabPanels extends HTMLElement {
   constructor() {
     super();
-    delegateEvent('click', 'tab-panels > nav > *', (e, delegate) => {
+    DOM.delegateEvent('click', 'tab-panels > nav > *', (e, delegate) => {
       let nav = delegate.parentElement;
       if (nav.parentElement === this) {
         this.setAttribute('selected-index', Array.prototype.indexOf.call(nav.children, delegate))

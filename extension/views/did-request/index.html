@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../sidebar.css" />
     <link rel="stylesheet" href="did-request.css" />
     <script src="/extension/js/custom-elements.js" type="module"></script>
-    <script src="/extension/js/web-components/persona-list.js" type="module"></script>
+    <script src="/extension/js/web-components/render-list.js" type="module"></script>
   </head>
 
   <body>
@@ -31,7 +31,7 @@
       <hr/>
 
       <div id="personas">
-        <persona-list id="persona_list" list="block" autoload-personas></persona-list>
+        <persona-list id="persona_list" options="autoload"></persona-list>
         <h5>Use one of your Personas</h5> 
         <p>
           Allows you to link your interactions to a Persona others may recognize.
@@ -46,6 +46,7 @@
 
     <script src="/extension/js/polyfills/web-extensions.js"></script>
     <script src="/extension/js/utils.js" type="module"></script>
+    <script src="/extension/js/jshashes.js"></script>
     <script src="/extension/js/jws.js"></script>
     <script src="../view.js" type="module"></script>
     <script src="../sidebar.js" type="module"></script>

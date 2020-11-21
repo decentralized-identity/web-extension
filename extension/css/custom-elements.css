@@ -141,6 +141,7 @@ tab-panels > nav > * {
   padding: 0.5em 1em;
   background: #e0e0e0;
   border: 1px solid #aaa;
+  border-radius: 0px;
   margin-left: -2px;
   cursor: pointer;
 }
@@ -207,26 +208,40 @@ modal-overlay:before {
   background: rgba(0,0,0,0.5);
 }
 
-modal-overlay > section {
+modal-overlay > article {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   box-sizing: border-box;
   max-height: 100%;
   margin: auto;
   background: #fff;
-  overflow: auto;
   z-index: 1;
 }
 
-modal-overlay > section > footer {
+modal-overlay > article > header [modal-close]:before {
+  content: "⨉";
+}
+
+modal-overlay > article > footer {
   display: flex;
+  /* flex: none; */
   justify-content: flex-end;
 }
 
-modal-overlay > section > footer:not(empty) {
-  padding: 1em 0 0;
-}
+  modal-overlay > article > header,
+  modal-overlay > article > footer {
+    padding: 0.8em;
+  }
 
-modal-overlay > section > footer > * {
-  margin: auto 0.5em;
+  modal-overlay > article > header:empty,
+  modal-overlay > article > footer:empty {
+    padding: 0.4em 0;
+  }
+
+modal-overlay > article > section {
+  padding: 0 1em;
+  overflow: auto;
 }
 
 /* NOTICE-BAR */
@@ -287,14 +302,14 @@ persona-list {
   text-align: center;
 }
 
-persona-list > div {
+persona-list > ul > li {
   width: 8em;
   margin: 0 1em;
   cursor: pointer;
   will-change: transform, opacity;
 }
 
-persona-list > div[persona-state="add"] {
+persona-list > ul > div[persona-state="add"] {
   opacity: 0;
   transform: scale(0.25);
   animation: scale-in 0.5s cubic-bezier(.47,1.64,.41,.8) 0.3s forwards;
@@ -308,6 +323,23 @@ persona-list h3 {
   margin: 0.5em 0 0;
 }
 
+/* CONNECTION-LIST */
+
+connection-list {
+  text-align: left;
+}
+
+connection-list th,
+connection-list td {
+  padding: 0.5em;
+}
+
+/* DATA-BROWSER */
+
+data-browser > ul > li {
+  padding: 0.4em 0.45em;
+  cursor: pointer;
+}
 
 /* Animations */
 

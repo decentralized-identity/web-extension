@@ -2,8 +2,10 @@
 (async function(){
 
   const root = document.documentElement;
+  const {default: uuid} = await import('/extension/js/modules/uuid.js');
   const {default: DOM} = await import('/extension/js/modules/dom.js');
   const {default: DID} = await import('/extension/js/modules/did.js');
+  const {default: Data} = await import('/extension/js/modules/data.js');
   const {default: Storage} = await import('/extension/js/modules/storage.js');
   const {default: ExtensionFrame} = await import('/extension/js/modules/extension-frame.js');
 
@@ -52,10 +54,17 @@
         if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
           throw 'NotAllowedError: DID interactions are only permitted in secure contexts (https, localhost)';
         }
-        let peer = await DID.getPeer(location.origin);
-        if (peer) {
-          if (peer.permissions.did_request === false) throw 'AbortError: No DID was returned';
-          if (peer.did) return peer.did.uri;
+        let cxn = await DID.getConnection(location.origin);
+        if (cxn) {
+          if (cxn.permissions.did_request === false) throw 'AbortError: No DID was returned';
+          if (cxn.did) {
+            let clientNonce = uuid.generate();
+            return {
+              did: cxn.did,
+              nonce: clientNonce,
+              jws: await DID.sign(message.props.nonce + clientNonce)
+            }
+          }
         }
         EXT.addMessageHandlers({
           'did_request_config': {
@@ -75,7 +84,6 @@
                 EXT.addMessageHandlers({
                   'did_response': {
                     action: async (message) => {
-                      console.log(message);
                       if (message.frame == sidebar.name) {
                         resolve(message.props);
                         sidebar.hide();

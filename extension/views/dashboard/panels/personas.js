@@ -19,7 +19,7 @@ import Storage from '/extension/js/modules/storage.js';
 import Router from '/extension/js/modules/router.js';
 import NoticeBar from '/extension/js/web-components/notice-bar.js';
 import PersonaIcons from '/extension/js/modules/persona-icons.js';
-import PersonaList from '/extension/js/web-components/persona-list.js';
+import RenderList from '/extension/js/web-components/render-list.js';
 
 globalThis.extensionStorage = Storage;
 
@@ -56,8 +56,9 @@ persona_create_form.addEventListener('submit', async (e) => {
   e.preventDefault(e);
   let persona = getPersonaCreateValues();
   persona.did = await DID.create();
+  persona.id = persona.did.id;
 
-  Storage.assign('personas', { [persona.did.uri]: persona }).then(z => {   
+  Storage.set('personas', persona).then(z => {   
     persona_did_list.add(persona);
     persona_create_modal.close();
     new NoticeBar({

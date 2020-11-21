@@ -1,11 +1,15 @@
 
 import Router from '/extension/js/modules/router.js';
 
-var panels = {};
+var panels = {
+  personas: false,
+  connections: false,
+  data: false,
+};
 async function initializePanel(panel){
-  if (!panels[panel]) {
-    panels[panel] = await import('./panels/personas.js');
-    await panels[panel].initialize();
+  if (panels[panel] === false) {
+    let module = panels[panel] = await import(`./panels/${panel}.js`);
+    if (module.initialize) await panels[panel].initialize();
   }
 }
 
@@ -18,10 +22,7 @@ Router.filters = [
     async listener(state, oldState){
       let lastView = oldState.params.view || 'personas';
       let currentView = state.params.view || 'personas';
-      switch(currentView){
-        case 'personas':
-          await initializePanel('personas');
-      }
+      await initializePanel(currentView);
       content_panels.open(currentView);
       // let currentScroll = { top: scrollY, left: scrollX };
       // let scroll = state.scroll = scrollPositions[currentView] = scrollPositions[currentView] || currentScroll;

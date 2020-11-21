@@ -1,9 +1,14 @@
 
 
 import '/extension/js/utils.js';
-import Storage from '/extension/js/modules/storage.js';
+import DID from '/extension/js/modules/did.js'; // DO NOT REMOVE!!!
+import Data from '/extension/js/modules/data.js';
+import Tabs from '/extension/js/modules/tabs.js';
+import Downloads from '/extension/js/modules/downloads.js';
 
 (function(){
+
+  EXT.data = Data;
 
   const extensionURL = browser.runtime.getURL('/');
   const dashboardURL = extensionURL + 'extension/views/dashboard/index.html';
@@ -20,21 +25,34 @@ import Storage from '/extension/js/modules/storage.js';
     })
   }
 
-  function createOrActivateTab(url){
-    browser.tabs.query({
-      url: [url, url + '?*'],
-      currentWindow: true
-    }).then(tabs => {
-      if (!tabs.length) browser.tabs.create({ url: url });
-      else browser.tabs.update(tabs[0].id, { active: true });
-    })
+  async function parseDidData(dl){
+    let url = new URL(dl.finalUrl);
+    let obj = await fetch(dl.finalUrl).then(raw => raw.json());
+    Data.storeObject(url.origin, obj)
+      .then(() => {
+        console.log('Works: ', url.origin);
+      })
+      .catch(e => console.log(e))
   }
 
   browser.browserAction.onClicked.addListener(tab => {
-    createOrActivateTab(dashboardURL);
+    Tabs.raiseTab(dashboardURL);
   });
 
+  let didDataRegex = /.*[.did].*.json/;
+  Downloads.onFileReady.addListener(async dl => {
+    if (dl.title.match(didDataRegex)) parseDidData(dl)
+  })
 
+
+
+
+
+
+
+
+
+  
   
   // ['page', 'frame', 'content', 'background'].forEach(env => {
   //   [true, false].forEach(untrusted => {

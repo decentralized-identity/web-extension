@@ -138,7 +138,7 @@ async function handleMessage(message, port){
             message.response = await handler.action(message, port || null);
           }
         }
-        catch (e) { message._error = e }
+        catch (e) { message._error = e; console.log(e); }
       }
       message.to = message.origin;
       EXT.sendMessage(message, port || null);

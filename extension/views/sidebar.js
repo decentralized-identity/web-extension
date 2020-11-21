@@ -1,6 +1,6 @@
 
 import DOM from '/extension/js/modules/dom.js';
-import PersonaList from '/extension/js/web-components/persona-list.js';
+import RenderList from '/extension/js/web-components/render-list.js';
 
 DOM.delegateEvent('pointerup', '[view-action="close"]', e => {
 

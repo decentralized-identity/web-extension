@@ -1,0 +1,10 @@
+{
+  "cSpell.enableFiletypes": [
+    "!cpp",
+    "!css",
+    "!java",
+    "!javascriptreact",
+    "!python",
+    "!rust"
+  ]
+}

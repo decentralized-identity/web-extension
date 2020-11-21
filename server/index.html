@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 login_form.addEventListener('submit', function(e){
   e.preventDefault();
-  navigator.did.authenticate().then(result => {
+  navigator.did.dev.authenticate().then(result => {
     
   }).catch(e => console.log(e));
 });
@@ -201,7 +201,7 @@ did_lookup_form.elements.did_lookup_input.addEventListener('blur', function(e){
 did_lookup_form.addEventListener('submit', function(e){
   e.preventDefault();
   var startTime = new Date().getTime();
-  navigator.did.lookup(this.elements.did_lookup_input.value)
+  navigator.did.dev.lookup(this.elements.did_lookup_input.value)
     .then(result => {
       console.log(result)
       manager = new IdentityHubManager(result);
@@ -214,7 +214,7 @@ did_lookup_form.addEventListener('submit', function(e){
 
 did_request_form.addEventListener('submit', function(e){
   e.preventDefault();
-  navigator.did.configuration().then(json => console.log(json));
+  navigator.did.dev.configuration().then(json => console.log(json));
 });
 
 </script>
