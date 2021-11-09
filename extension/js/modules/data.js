@@ -10,29 +10,36 @@ const colonSlashReplaceRegex = /:*\/+/g;
 let sheets = {};
 let templates = {};
 export default {
-  getObjectId(obj){
-    return obj.id && obj.id.toLowerCase();
+  getObjectId(vc){
+    return vc.id && vc.id.toLowerCase();
   },
-  getTypeKey(obj){
-    let uri = obj.credentialSchema && obj.credentialSchema.id;
+  getTypeKey(vc){
+    let uri = vc.credentialSchema && vc.credentialSchema.id;
     return uri ? uri.toLowerCase().replace(colonSlashReplaceRegex, '—') : null;
   },
-  async storeObject(origin, obj, merge){
-    let id = this.getObjectId(obj);
+  validateObject(vc){
+    let id = this.getObjectId(vc);
     if (!id) throw 'DataError: all objects must include an id property';
-    let type = this.getTypeKey(obj);
-    if (!type) throw 'DataError: all objects must include a credentialSchema object with a schema id';
+    let type = this.getTypeKey(vc);
+    if (!type) throw 'DataError: all objects must include a credentialSchema type identifier';
+    return true;
+  },
+  async storeObject(origin, vc, merge){
+    let id = this.getObjectId(vc);
+    if (!id) throw 'DataError: all objects must include an id property';
+    let type = this.getTypeKey(vc);
+    if (!type) throw 'DataError: all objects must include a credentialSchema type identifier';
     Storage.modify('data', id, (entry, exists) => {
       let current = exists ? entry : {
         id: id,
         type: type,
         origin: origin,
-        data: obj
+        data: vc
       };
       if (merge) {
-        Natives.merge(current, { data: obj });
+        Natives.merge(current, { data: vc });
       }
-      else current.data = obj;
+      else current.data = vc;
       return current;
     })
   },

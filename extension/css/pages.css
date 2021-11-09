@@ -18,3 +18,27 @@
 .did-extension-sidebar[show-did-extension-sidebar] {
   transform: translateX(0%);  
 }
+
+verifiable-content {
+  position: relative;
+  display: inline-block;
+}
+
+verifiable-content > * {
+  max-width: 100%;
+}
+
+/* verifiable-content:after {
+  content: url(https://raw.githubusercontent.com/gist/csuwildcat/5cde58c7732681755d36ce8aa956cce7/raw/4348e0d303e05e7e35f8f0eaf28bd5417b0fe4c4/badge.svg);
+  display: block;
+  position: absolute;
+  top: 1vw;
+  right: 1vw;
+  width: 1vw;
+  height: 1vw;
+  font-size: 1vw;
+}
+
+verifiable-content:after {
+  color: green;
+} */

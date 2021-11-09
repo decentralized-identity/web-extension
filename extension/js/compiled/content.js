@@ -1752,7 +1752,17 @@ var PE = {
                 }
               });
             })
-          }
+          },
+          async offerCredential (vc){
+            if (!vc) throw 'DataError: you did not pass a credential to offer the user';
+            return EXT.request({
+              type: 'credential_offer',
+              to: 'content',
+              props: {
+                vc: vc
+              }
+            });
+          },
         }
       };
 
@@ -1790,7 +1800,7 @@ var PE = {
 
   function openSidebar(options = {}){
     if (sidebarOpen) {
-      throw 'OperationError: DID interaction in progress, cannot initiate another unil the previous interaction is finished';
+      throw 'OperationError: DID interaction in progress, cannot initiate another until the previous interaction is finished';
     }
     sidebarInstance = sidebarInstance || new ExtensionFrame({
       classes: 'did-extension-sidebar',
@@ -1816,30 +1826,36 @@ var PE = {
     if (sidebarInstance) sidebarInstance.hide();
   }
 
+  async function getAllowedConnection(msg, options = {}){
+    if (msg.from !== 'page') return;
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      throw 'NotAllowedError: DID interactions are only permitted in secure contexts (https, localhost)';
+    }
+    let cxn = await DID.getConnection(location.origin);
+    if (options.permission && cxn.permissions[options.permission] === false) {
+      return false;
+    }
+    return cxn;
+  }
+
   EXT.addMessageHandlers({
     'did_resolution': {
       untrusted: true,
       action: async (message) => {
-        return await fetch('https://resolver.identity.foundation/1.0/identifiers/' + message.props.did).then(res => res.json());
+        return await DID.resolve(message.props.did);
       }
     },
     'did_request': {
       untrusted: true,
       action: async (message) => {
-        if (message.from !== 'page') return;
-        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-          throw 'NotAllowedError: DID interactions are only permitted in secure contexts (https, localhost)';
-        }
-        let cxn = await DID.getConnection(location.origin);
-        if (cxn) {
-          if (cxn.permissions.did_request === false) throw 'AbortError: No DID was returned';
-          if (cxn.did) {
-            let clientNonce = uuid.generate();
-            return {
-              did: cxn.did,
-              nonce: clientNonce,
-              jws: await DID.sign(message.props.nonce + clientNonce)
-            }
+        let cxn = await getAllowedConnection(message, { permission: 'did_request' });
+        if (cxn === false) throw 'AbortError: No DID was returned';
+        else if (cxn && cxn.did) {
+          let clientNonce = uuid.generate();
+          return {
+            did: cxn.did,
+            nonce: clientNonce,
+            jws: await DID.sign(cxn.did, message.props.nonce + clientNonce)
           }
         }
         EXT.addMessageHandlers({
@@ -1885,6 +1901,51 @@ var PE = {
       untrusted: true,
       action: (message) => {
         openSidebar('/extension/views/presentation-exchange/index.html')
+      }
+    },
+    'credential_offer': {
+      untrusted: true,
+      action: async (message) => {
+        let cxn = getAllowedConnection(message, { permission: 'credential_offers' });
+        await Data.validateObject(message.props.vc).catch(e => { throw e });
+        if (!message.props.vc || cxn === false) throw 'AbortError: Credential was not accepted';
+        EXT.addMessageHandlers({
+          'credential_offer_config': {
+            action: () => {
+              return {
+                uri: location.origin,
+                vc: message.props.vc
+              };
+            }
+          }
+        });
+        return await new Promise((resolve, reject) => {
+          try {
+            openSidebar({
+              src: '/extension/views/offer-credential/index.html',
+              onLoad(sidebar) {
+                EXT.addMessageHandlers({
+                  'credential_offer_response': {
+                    action: async (message) => {
+                      if (message.frame == sidebar.name) {
+                        resolve(message.props);
+                        sidebar.hide();
+                        sidebarInstance = null;
+                      }
+                    }
+                  }
+                });
+              },
+              onHide(){
+                reject('AbortError: Credential was not accepted');
+                sidebarInstance = null;
+              }
+            })
+          }
+          catch (e){ reject(e) }
+        }).finally(() => {
+          EXT.removeMessageHandlers('did_request_config', 'credential_offer_response');
+        })
       }
     },
     'sidebar_close': {

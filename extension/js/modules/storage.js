@@ -2,11 +2,10 @@
 import Natives from '/extension/js/modules/natives.js';
 import Dexie from '/extension/js/modules/dexie.js';
 
-var storage = browser.storage.local;
-
 const db = new Dexie('DIDWebExtension');
 
 db.version(1).stores({
+  dids: 'id',
   personas: 'id',
   connections: 'id,did',
   data: 'id,type,origin',
@@ -14,6 +13,7 @@ db.version(1).stores({
 });
 
 var storageMethods = {
+  db: db,
   query (store, keys){
     return db[store].where(keys);
   },

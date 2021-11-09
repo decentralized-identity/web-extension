@@ -32,8 +32,10 @@
     "extension/js/modules/*",
     "extension/js/polyfills/*",
     "extension/js/utils.js",
+    "extension/js/verifiable-content.js",
     "extension/js/content.js",
-    "extension/views/*"
+    "extension/views/*",
+    "extension/images/icons/badge.svg"
   ],
 
   "options_ui": {
@@ -68,6 +70,14 @@
         "extension/js/jshashes.js",
         "extension/js/utils.js",
         "extension/js/compiled/content.js"
+      ]
+    },
+    {
+      "match_about_blank": true,
+      "matches": ["<all_urls>"],
+      "run_at": "document_end",
+      "js": [
+        "extension/js/verifiable-content.js"
       ]
     }
   ]

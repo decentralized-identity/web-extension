@@ -131,6 +131,10 @@
         border: none;
       }
 
+      verifiable-content {
+        max-width: 50%;
+      }
+
     </style>
 
 
@@ -143,6 +147,19 @@
 
 
   <main>
+
+    <verifiable-content 
+    did="did:key:z6MkhYJLV7uPMm2YcvTU7JcGYeZx3Z7my8ZgT2rySt8xNhY3"
+    signature="2BH9ybNaSme9Tgtv61Hdm29UwMyLkz4ed2TLDLR65FDoPmj5x4meSD8jJMdBj416NqKL6xGLD9yN8pDx2uq7uZ7f">
+    
+    <img 
+      id="signed_image" 
+      onclick="this.setAttribute('src', '/server/images/verifiable-images/nessie.jpg')" 
+      src="/server/images/verifiable-images/bigfoot.jpg" />
+      
+  </verifiable-content>
+
+  <verifiable-content id="text" did="did:key:z6MkvYxr1KsYo8yuqDTfh3BoyoYdBMcKU9rjtwRT9TJmGNaM">test</verifiable-content>
 
     <section id="login">
       <h2>Login with a DID</h2>
@@ -174,7 +191,6 @@
         <button id="submit_did_request" type="submit" styled="center">Request</button>
       </form>
     </section>
-
 
   </main>
 

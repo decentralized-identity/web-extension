@@ -286,7 +286,17 @@ var PE = {
                 }
               });
             })
-          }
+          },
+          async offerCredential (vc){
+            if (!vc) throw 'DataError: you did not pass a credential to offer the user';
+            return EXT.request({
+              type: 'credential_offer',
+              to: 'content',
+              props: {
+                vc: vc
+              }
+            });
+          },
         }
       };
 

@@ -16,16 +16,16 @@ let getRequestConfig = new Promise((resolve, reject) => {
 create_pairwise_did.addEventListener('pointerup', async e => {
   let config = await getRequestConfig;
   if (!config) return false;
-  let peer = await DID.createPeerDID(config.uri);
+  let peer = await DID.createPeerDID(config.uri, { method: 'key' });
+  console.log(peer);
   let nonce = uuid.generate();
-  let jws = await DID.sign(config.nonce + uuid.generate())
   EXT.sendMessage({
     type: 'did_response',
     to: 'content',
     props: {
       did: peer.did,
       nonce: nonce,
-      jws: jws
+      signature: await DID.sign(peer.did, config.nonce + nonce)
     },
     error: error => {
       console.log(error);

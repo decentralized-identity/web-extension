@@ -94,7 +94,7 @@ class RenderList extends HTMLElement {
       let tr = document.createElement('tr');
           tr.setAttribute('connection-id', cxn.id);
           if (options.state) tr.setAttribute('connection-state', options.state);
-          tr.innerHTML = `<td>${cxn.id}</td><td>${cxn.did ? cxn.did.id : ''}</td>`;
+          tr.innerHTML = `<td>${cxn.id}</td><td>${cxn.did || ''}</td>`;
       return tr;
     }
     

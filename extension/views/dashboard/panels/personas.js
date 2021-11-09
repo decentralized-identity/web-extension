@@ -55,10 +55,7 @@ DOM.delegateEvent('pointerup', '[modal="create-persona"]', e => {
 persona_create_form.addEventListener('submit', async (e) => {
   e.preventDefault(e);
   let persona = getPersonaCreateValues();
-  persona.did = await DID.create();
-  persona.id = persona.did.id;
-
-  Storage.set('personas', persona).then(z => {   
+  DID.createPersona(persona).then(z => {   
     persona_did_list.add(persona);
     persona_create_modal.close();
     new NoticeBar({
