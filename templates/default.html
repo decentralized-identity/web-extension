@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {% include "head.html" %}
+
+  <body>
+
+    <svg style="display: none">
+      {% include "svg.html" %}
+      {% block svg %}{% endblock %}
+    </svg>
+
+    {% if no_nav %}
+    
+    {% else %}
+      {% include "nav.html" %}
+    {% endif %}
+  
+    <slide-panels id="overlay_panels">
+      {% block overlays %}{% endblock %}
+    </slide-panels>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    {% if no_footer %}
+    
+    {% else %}
+      <footer id="footer">
+        {% block footer %}{% endblock %}
+      </footer>    
+    {% endif %}
+
+    {% block modals %}{% endblock %}
+    
+    {% block scripts %}
+      <script src="/assets/js/compiled/body.js"></script>
+    {% endblock %}
+
+    {% for file in js %}
+      <script src="/assets/js/{{file.path}}.js" {{ 'type=module' if file.module else '' }}></script>
+    {% endfor %}
+
+  </body>
+
+</html>

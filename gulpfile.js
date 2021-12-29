@@ -1,30 +1,123 @@
 
+// const fs = require('fs-extra');
+// const gulp = require('gulp');
+
+// async function compileContentScript(){
+//   return Promise.all([
+//       './extension/js/content.js',
+//       './extension/js/polyfills/web-extensions.js',
+//       './extension/js/utils.js',
+//       './extension/js/polyfills/navigator.js'
+//     ].map(file => fs.promises.readFile(file, 'utf8'))).then(files => {
+//       let content = files.shift();
+//       return fs.outputFile('extension/js/compiled/content.js', `
+//         let pageScript = document.createElement('script');
+//         pageScript.async = false;
+//         pageScript.textContent = '(' + (function(){ ${files.join(';')} }).toString() + ')()';
+//         document.documentElement.prepend(pageScript);
+//         ${content}
+//       `);   
+//     });
+// }
+
+// gulp.task('compile', compileContentScript);
+
+// gulp.task('watch', () => gulp.watch([
+//   'extension/js/content.js',
+//   'extension/js/polyfills/web-extensions.js',
+//   'extension/js/utils.js',
+//   'extension/js/polyfills/navigator.js'
+// ], gulp.parallel('compile')));
+
+
+
 const fs = require('fs-extra');
 const gulp = require('gulp');
+const concat = require('gulp-concat');
+const terser = require('gulp-terser');
+const cleanCSS = require('gulp-clean-css');
+const mergeStreams = require('merge-stream');
+const nunjucksRender = require('gulp-nunjucks-render');
+const axios = require('axios');
 
-async function compileContentScript(){
-  return Promise.all([
-      './extension/js/content.js',
-      './extension/js/polyfills/web-extensions.js',
-      './extension/js/utils.js',
-      './extension/js/polyfills/navigator.js'
-    ].map(file => fs.promises.readFile(file, 'utf8'))).then(files => {
-      let content = files.shift();
-      return fs.outputFile('extension/js/compiled/content.js', `
-        let pageScript = document.createElement('script');
-        pageScript.async = false;
-        pageScript.textContent = '(' + (function(){ ${files.join(';')} }).toString() + ')()';
-        document.documentElement.prepend(pageScript);
-        ${content}
-      `);   
-    });
+const root = 'extension/';
+const compiledJS = root + 'js/compiled/';
+const compiledCSS = root + 'css/compiled/';
+
+var assets = {
+  js: {
+    'web-components': [
+      'slide-panels.js',
+      'tab-panels.js',
+      'render-list.js',
+      'modal-overlay.js',
+      'detail-box.js',
+      'notice-bar.js',
+    ].map(name => root + 'js/web-components/' + name),
+    body: [
+      root + 'js/global.js'
+    ]
+  },
+  css: {
+    'head': [
+      root + 'css/view.css',
+      root + 'css/font-awesome.css'
+    ],
+    'web-components': [
+      'slide-panels.css',
+      'modal-overlay.css',
+      'tab-panels.css',
+      'detail-box.css',
+      'notice-bar.css',   
+      'item-lists.css',
+     // 'schema-form.css',
+    ].map(name => root + 'css/web-components/' + name),
+  }
+};
+
+async function compileJS(){
+  return new Promise(async resolve => {
+    await fs.ensureDir(compiledJS);
+    mergeStreams(
+      ...Object.keys(assets.js).map(file => {
+        return gulp.src(assets.js[file])
+                   .pipe(terser())
+                   .pipe(concat(file + '.js'))
+                   .pipe(gulp.dest(compiledJS))
+      })
+    ).on('finish', () => resolve())
+  });
 }
 
-gulp.task('compile', compileContentScript);
+async function compileCSS(){
+  return new Promise(async resolve => {
+    await fs.ensureDir(compiledCSS);
+    mergeStreams(
+      ...Object.keys(assets.css).map(file => {
+        return gulp.src(assets.css[file])
+                   .pipe(cleanCSS())
+                   .pipe(concat(file + '.css'))
+                   .pipe(gulp.dest(compiledCSS))
+      })
+    ).on('finish', () => resolve())
+  });
+}
 
-gulp.task('watch', () => gulp.watch([
-  'extension/js/content.js',
-  'extension/js/polyfills/web-extensions.js',
-  'extension/js/utils.js',
-  'extension/js/polyfills/navigator.js'
-], gulp.parallel('compile')));
+async function renderTemplates() {
+  return gulp.src('templates/pages/**/*.html')
+    .pipe(nunjucksRender({
+      path: ['templates', 'templates/partials', 'templates/pages'],
+      data: {
+        
+      }
+    }))
+    .pipe(gulp.dest('./extension/'))
+};
+
+gulp.task('build', gulp.series(compileCSS, compileJS, renderTemplates));
+
+gulp.task('watch', () => {
+  gulp.watch([root + 'js/**/*', '!' + root + 'js/compiled/**/*'], compileJS);
+  gulp.watch([root + 'css/**/*', '!' + root + 'css/compiled/**/*'], compileCSS);
+  gulp.watch(['templates/**/*'], gulp.parallel(renderTemplates));
+});
