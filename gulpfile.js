@@ -1,36 +1,4 @@
 
-// const fs = require('fs-extra');
-// const gulp = require('gulp');
-
-// async function compileContentScript(){
-//   return Promise.all([
-//       './extension/js/content.js',
-//       './extension/js/polyfills/web-extensions.js',
-//       './extension/js/utils.js',
-//       './extension/js/polyfills/navigator.js'
-//     ].map(file => fs.promises.readFile(file, 'utf8'))).then(files => {
-//       let content = files.shift();
-//       return fs.outputFile('extension/js/compiled/content.js', `
-//         let pageScript = document.createElement('script');
-//         pageScript.async = false;
-//         pageScript.textContent = '(' + (function(){ ${files.join(';')} }).toString() + ')()';
-//         document.documentElement.prepend(pageScript);
-//         ${content}
-//       `);   
-//     });
-// }
-
-// gulp.task('compile', compileContentScript);
-
-// gulp.task('watch', () => gulp.watch([
-//   'extension/js/content.js',
-//   'extension/js/polyfills/web-extensions.js',
-//   'extension/js/utils.js',
-//   'extension/js/polyfills/navigator.js'
-// ], gulp.parallel('compile')));
-
-
-
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const concat = require('gulp-concat');
@@ -38,7 +6,6 @@ const terser = require('gulp-terser');
 const cleanCSS = require('gulp-clean-css');
 const mergeStreams = require('merge-stream');
 const nunjucksRender = require('gulp-nunjucks-render');
-const axios = require('axios');
 
 const root = 'extension/';
 const compiledJS = root + 'js/compiled/';
@@ -55,12 +22,12 @@ var assets = {
       'notice-bar.js',
     ].map(name => root + 'js/web-components/' + name),
     body: [
-      root + 'js/global.js'
+      root + 'js/views/view.js'
     ]
   },
   css: {
     'head': [
-      root + 'css/view.css',
+      root + 'css/views/view.css',
       root + 'css/font-awesome.css'
     ],
     'web-components': [
@@ -69,8 +36,7 @@ var assets = {
       'tab-panels.css',
       'detail-box.css',
       'notice-bar.css',   
-      'item-lists.css',
-     // 'schema-form.css',
+      'item-lists.css'
     ].map(name => root + 'css/web-components/' + name),
   }
 };
@@ -111,7 +77,7 @@ async function renderTemplates() {
         
       }
     }))
-    .pipe(gulp.dest('./extension/'))
+    .pipe(gulp.dest('./extension/views'))
 };
 
 gulp.task('build', gulp.series(compileCSS, compileJS, renderTemplates));

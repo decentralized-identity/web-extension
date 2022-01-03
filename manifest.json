@@ -13,7 +13,7 @@
     "128": "extension/images/icons/user-128.png"
   },
   "action": {
-    "default_popup": "extension/views/popup/index.html",
+    // "default_popup": "extension/views/popup/index.html",
     "default_icon": {
       "16": "extension/images/icons/user-16.png",
       "24": "extension/images/icons/user-24.png",
@@ -24,9 +24,10 @@
   },
   "web_accessible_resources": [{
     "resources": [
-      "extension/js/modules/uuid.mjs",
-      "extension/js/modules/extension-messenger.mjs",
-      "extension/page.mjs"
+      "extension/js/modules/natives.js",
+      "extension/js/modules/uuid.js",
+      "extension/js/modules/extension-messenger.js",
+      "extension/page.js"
     ],
     "matches": ["<all_urls>"]
   }],
@@ -50,7 +51,7 @@
     }]
   },
   "background": {
-    "service_worker": "extension/background.mjs",
+    "service_worker": "extension/background.js",
     "type": "module"
   },
   "content_scripts": [{

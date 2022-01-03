@@ -5,13 +5,22 @@
   "homepage": "http://identity.foundation",
   "license": "Apache 2",
   "main": "server.js",
-  "dependencies": {
+  "devDependencies": {
     "fs-extra": "9.0.1",
     "gulp": "4.0.2",
+    "gulp-concat": "2.6.1",
+    "gulp-terser": "2.1.0",
+    "gulp-clean-css": "4.3.0",
+    "merge-stream": "2.0.0",
+    "gulp-nunjucks-render": "2.2.3",
     "koa": "2.5.1",
     "koa-body": "2.5.0",
     "koa-mount": "3.0.0",
     "koa-router": "7.4.0",
     "koa-static": "4.0.2"
+  },
+  "dependencies": {
+    "@decentralized-identity/ion-tools": "0.0.1",
+    "@nano-sql/core": "2.3.7"
   }
 }
