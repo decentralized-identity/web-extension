@@ -1,5 +1,5 @@
 
-import '../modules/dom.js';
+import '/extension/js/modules/dom.js';
 
 var SlidePanels = globalThis.SlidePanels = class SlidePanels extends HTMLElement {
   static get observedAttributes() {

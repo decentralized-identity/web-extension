@@ -1,5 +1,5 @@
 
-import '../modules/dom.js';
+import '/extension/js/modules/dom.js';
 
 var DIDViewer = globalThis.DIDViewer = class DIDViewer extends HTMLElement {
   static get observedAttributes() {

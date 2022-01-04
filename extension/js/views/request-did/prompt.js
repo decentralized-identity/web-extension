@@ -1,9 +1,9 @@
 
-import {UUID} from '/assets/js/modules/uuid.js';
-import {DID} from '/assets/js/modules/did.js';
-import {DOM} from '/assets/js/modules/dom.js';
-import {RenderList} from '/assets/js/compiled/web-components.js';
 
+import {DID} from '/extension/js/modules/did.js';
+import {DOM} from '/extension/js/modules/dom.js';
+import {UUID} from '/extension/js/modules/uuid.js';
+import {RenderList} from '/extension/js/compiled/web-components.js';
 
 create_pairwise_button.addEventListener('pointerup', async e => {
   let methods = invocationData?.methods || ['ion'];

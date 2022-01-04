@@ -1,0 +1,18 @@
+{
+  "name": "did-web-polyfill",
+  "description": "Web polyfill for DID & Identity Hub APIs",
+  "version": "0.0.1",
+  "homepage": "http://identity.foundation",
+  "license": "Apache 2",
+  "main": "index.js",
+  "devDependencies": {
+    "koa": "2.5.1",
+    "koa-body": "2.5.0",
+    "koa-mount": "3.0.0",
+    "koa-router": "7.4.0",
+    "koa-static": "4.0.2"
+  },
+  "dependencies": {
+    "@decentralized-identity/ion-tools": "0.0.1"
+  }
+}

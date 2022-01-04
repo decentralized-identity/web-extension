@@ -1,5 +1,5 @@
 
-import '../modules/dom.js';
+import '/extension/js/modules/dom.js';
 
 var ModalOverlay = globalThis.ModalOverlay = class ModalOverlay extends HTMLElement {
   static get observedAttributes() {

@@ -22,6 +22,7 @@ var assets = {
       'notice-bar.js',
     ].map(name => root + 'js/web-components/' + name),
     body: [
+      root + 'content.js',
       root + 'js/views/view.js'
     ]
   },

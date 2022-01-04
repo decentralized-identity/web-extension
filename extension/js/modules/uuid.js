@@ -23,4 +23,4 @@ const UUID = {
   } 
 };
 
-export default UUID;
+export { UUID };

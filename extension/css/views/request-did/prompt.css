@@ -1,5 +1,9 @@
 
 
+main {
+  padding: 2em;
+}
+
 #create_pairwise_did {
   display: block;
   margin: 0 auto;

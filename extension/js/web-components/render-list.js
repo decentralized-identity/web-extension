@@ -1,8 +1,8 @@
 
-import { DOM } from '../modules/dom.js';
-import { DID } from '../modules/did.js';
-// import { Data } from '../modules/data.js';
-import { Storage } from '../modules/storage.js';
+import { DOM } from '/extension/js/modules/dom.js';
+import { DID } from '/extension/js/modules/did.js';
+// import { Data } from '/extension/js/modules/data.js';
+import { Storage } from '/extension/js/modules/storage.js';
 
 class RenderList extends HTMLElement {
   constructor (options = {}) {

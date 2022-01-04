@@ -1,5 +1,5 @@
 
-import UUID from '/extension/js/modules/uuid.js';
+import { UUID } from '/extension/js/modules/uuid.js';
 
 const Listeners = {};
 const Callbacks = {};
@@ -96,7 +96,7 @@ const ExtensionMessenger = {
           params.tabs.forEach(tabId => chrome.tabs.sendMessage(tabId, message, { frameId: 0 },))
         }
         else {
-          chrome.tabs.query({}, tabs => {
+          chrome.tabs.query({ url: ['http://*/*', 'https://*/*', 'data://*/*'] }, tabs => {
             tabs.forEach(tab => {
               chrome.tabs.sendMessage(tab.id, message, { frameId: 0 })
             });
@@ -124,4 +124,4 @@ const ExtensionMessenger = {
   }
 }
 
-export default ExtensionMessenger;
+export { ExtensionMessenger };

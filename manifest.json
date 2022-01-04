@@ -24,8 +24,9 @@
   },
   "web_accessible_resources": [{
     "resources": [
-      "extension/js/modules/natives.js",
-      "extension/js/modules/uuid.js",
+      "extension/views/*",
+      "extension/js/modules/*",
+      "extension/js/did-methods/*",
       "extension/js/modules/extension-messenger.js",
       "extension/page.js"
     ],

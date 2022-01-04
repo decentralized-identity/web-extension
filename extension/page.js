@@ -1,5 +1,5 @@
 
-import Messenger from './js/modules/extension-messenger.js';
+import { ExtensionMessenger as Messenger } from '/extension/js/modules/extension-messenger.js';
 
 const NavigatorInterfaces = {
   api: {
@@ -20,7 +20,7 @@ const NavigatorInterfaces = {
     value: () => new Promise(resolve => {
       Messenger.send({
         topic: 'requestIdentifier',
-        to: 'background',
+        to: 'content',
         callback: response => resolve(response)
       })
     })
@@ -35,7 +35,7 @@ const NavigatorInterfaces = {
     value: () => new Promise(resolve => {
       Messenger.send({
         topic: 'requestCredentials',
-        to: 'background',
+        to: 'content',
         callback: response => resolve(response)
       })
     })

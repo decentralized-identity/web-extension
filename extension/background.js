@@ -1,20 +1,19 @@
 
-
-import Messenger from '/extension/js/modules/extension-messenger.js';
+import { ExtensionMessenger as Messenger } from '/extension/js/modules/extension-messenger.js';
 
 const dashboardUrl = chrome.runtime.getURL('/extension/views/dashboard/index.html');
 
 
 chrome.runtime.onInstalled.addListener(() => {
 
-  chrome.tabs.query({}, tabs => {
-    tabs.forEach(tab => {
-      chrome.scripting.executeScript({
-        target: {tabId: tab.id},
-        files: ['extension/content.js'],
-      })
-    });
-  });
+  // chrome.tabs.query({ url: ['http://*/*', 'https://*/*', 'data:*'] }, tabs => {
+  //   tabs.forEach(tab => {
+  //     chrome.scripting.executeScript({
+  //       target: {tabId: tab.id},
+  //       files: ['extension/content.js'],
+  //     })
+  //   });
+  // });
 
 });
 
@@ -32,16 +31,6 @@ chrome.action.onClicked.addListener(tab => {
     })
   });
 
-  chrome.scripting.executeScript({
-    target: {tabId: tab.id},
-    files: ['extension/content.js']
-  });
-});
-
-
-Messenger.addListener('requestIdentifier', (message) => {
-  console.log('requestIdentifier: ', message);
-  return 'did:ion:123';
 });
 
 // setTimeout(function(){

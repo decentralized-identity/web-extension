@@ -50,7 +50,6 @@ var Router = globalThis.Router = Object.assign({
       let path = filter.path.replace(/\/$/, '');
       let pathMatched = path && path === newState.path;
       let pathChanged = pathMatched && path !== oldState.path;
-      console.log(filter, pathMatched);
       let paramsChanged = filter.params ? filter.params.some(param => {
         return oldState.params[param] !== newState.params[param];
       }) : false;
