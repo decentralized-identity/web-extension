@@ -1,29 +1,33 @@
 
 {% set no_nav = true %}
-{% set css = ['views/popup', 'views/request-did/prompt'] %}
-{% set js = [{ path: 'request-did/prompt', module: true }] %}
+{% set css = ['views/popup', 'views/request-did/request-did'] %}
+{% set js = [{ path: 'views/popup', module: true }, { path: 'views/request-did/request-did', module: true }] %}
 
 {% extends "default.html" %}
 
+  {% block header %}
+
+    <header>
+      <h2>The app <code class="connection-origin"></code> wants to connect</h2>
+    </header>
+
+  {% endblock %}
+
   {% block content %}
 
-    <header class="panel-header">
-      <h2>This site is requesting a DID from you</h2>
-    </header>
-    
-    <h5>Create a new DID just for this site</h5>
+    <h5>Create a new ID just for this connection</h5>
     <p>
-      Provides better privacy if you don't need interactions linked to a Persona.
+      Provides better privacy if you don't want your activities linked to a Persona.
     </p>
-    <button id="create_pairwise_button" options="action"><i class="fas fa-user"></i> Create a new DID</button>
+    <button id="create_pairwise_button" options="action"><i class="fas fa-user"></i>Connect Privately</button>
 
     <hr/>
 
     <div id="personas">
       <persona-list id="persona_list" options="autoload"></persona-list>
-      <h5>Use one of your Personas</h5> 
+      <h5>Connect with one of your Personas</h5> 
       <p>
-        Allows you to link your interactions to a Persona others may recognize.
+        Connecting with a Persona allows your interactions to be associated more closely with you.
       </p>
     </div>
 
@@ -31,6 +35,6 @@
 
   {% block footer %}
     <div banner="warning">
-      Block this site from requesting DIDs? <button id="block_did_requests" view-action="close" options="cancel">Block</button>
+      Block this app from making requests: <button id="block_did_requests" view-action="close" options="cancel">Block</button>
     </div>
   {% endblock %}

@@ -20,6 +20,8 @@
       {% block overlays %}{% endblock %}
     </slide-panels>
 
+    {% block header %}{% endblock %}
+
     <main>
       {% block content %}{% endblock %}
     </main>
@@ -35,7 +37,7 @@
     {% block modals %}{% endblock %}
     
     {% block scripts %}
-      <script src="../../js/compiled/body.js"></script>
+      <script src="../../js/compiled/body.js" type="module"></script>
     {% endblock %}
 
     {% for file in js %}

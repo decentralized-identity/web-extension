@@ -84,7 +84,7 @@ async function renderTemplates() {
 gulp.task('build', gulp.series(compileCSS, compileJS, renderTemplates));
 
 gulp.task('watch', () => {
-  gulp.watch([root + 'js/**/*', '!' + root + 'js/compiled/**/*'], compileJS);
-  gulp.watch([root + 'css/**/*', '!' + root + 'css/compiled/**/*'], compileCSS);
+  gulp.watch([root + '**/*.js', '!' + root + 'js/compiled/**/*'], compileJS);
+  gulp.watch([root + '**/*.css', '!' + root + 'css/compiled/**/*'], compileCSS);
   gulp.watch(['templates/**/*'], gulp.parallel(renderTemplates));
 });

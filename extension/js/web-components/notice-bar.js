@@ -28,7 +28,7 @@ var NoticeBar = globalThis.NoticeBar = class NoticeBar extends HTMLElement {
   notify (options){
     this.options = options || this.options;
     this.render(this.options);
-    DOM.skipAnimationFrame(() => this.setAttribute('notice-state', 'show'));
+    DOM.skipFrame(() => this.setAttribute('notice-state', 'show'));
   }
 };
 

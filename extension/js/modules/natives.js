@@ -8,10 +8,10 @@ const Natives = {
     });
     return target;
   },
-  pick(source, entries){
-    return entries.reduce((obj, key) => {
-      if (key in source) obj[key] = source[key];
-      return obj;
+  pick(object, keys){
+    return keys.reduce((result, key) => {
+      if (Object.hasOwn(object, key)) result[key] = object[key];
+      return result;
     }, {})
   }
 }

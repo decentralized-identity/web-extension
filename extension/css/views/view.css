@@ -163,6 +163,14 @@ p {
   margin: 0 0 1.5em;
 }
 
+code {
+  font-size: 0.9em;
+  margin: 0 .15em;
+  padding: .1em .275em .15em;
+  background: rgba(0,0,0,.3);
+  border-radius: 2px;
+}
+
 button {
   padding: 0.55em 0.75em 0.5em;
   background: #ddd;
@@ -189,6 +197,10 @@ button[options~="cancel"] {
 button[options~="icon"] {
   font-size: 1.25em;
   padding: .375em .4em .3em;
+}
+
+button i {
+  margin-right: 0.4em;
 }
 
 ul, ol {

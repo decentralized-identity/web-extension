@@ -17,13 +17,11 @@ const NavigatorInterfaces = {
     enumerable: true,
     writeable: false,
     configurable: false,
-    value: () => new Promise(resolve => {
-      Messenger.send({
-        topic: 'requestIdentifier',
-        to: 'content',
-        callback: response => resolve(response)
-      })
-    })
+    value: () => Messenger.send({
+      topic: 'requestIdentifier',
+      to: 'content',
+      callback: true
+    }).promise
   },
   requestCredentials: {
     metadata: {
@@ -32,13 +30,11 @@ const NavigatorInterfaces = {
     enumerable: true,
     writeable: false,
     configurable: false,
-    value: () => new Promise(resolve => {
-      Messenger.send({
-        topic: 'requestCredentials',
-        to: 'content',
-        callback: response => resolve(response)
-      })
-    })
+    value: () => Messenger.send({
+      topic: 'requestCredentials',
+      to: 'content',
+      callback: true
+    }).promise
   }
 }
 

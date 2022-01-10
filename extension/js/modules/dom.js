@@ -5,8 +5,13 @@ const createProps = {
 
 var DOM = {
   ready: new Promise(resolve => {
-    document.addEventListener('DOMContentLoaded', e => resolve(e));
+    document.addEventListener('DOMContentLoaded', e => {
+      document.documentElement.setAttribute('ready', '');
+      resolve(e)
+    });
   }),
+  query: s => document.querySelector(s),
+  queryAll: s => document.querySelectorAll(s),
   create(tag, props = {}){
     let node = document.createElement(tag);
     for (let z in props) {
@@ -15,8 +20,8 @@ var DOM = {
     }
     return node;
   },
-  skipAnimationFrame: fn => new Promise(resolve => requestAnimationFrame(() => {
-    requestAnimationFrame(function(){
+  skipFrame: fn => new Promise(resolve => requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
       if (fn) fn();
       resolve();
     })
@@ -67,12 +72,19 @@ var DOM = {
       popup.addEventListener('beforeunload', options.onBeforeUnload)
     }
 
-    popup.invocationData = options.invocationData;
     popup.focus();
 
     return popup;
   }
 }
+
+document.addEventListener('pointerdown', e => {
+  e.target.setAttribute('pressed', true);
+}, { passive: true });
+
+window.addEventListener('pointerup', e => {
+  DOM.queryAll('[pressed]').forEach(node => node.removeAttribute('pressed'));
+}, { passive: true });
 
 globalThis.DOM = DOM;
 
