@@ -2,7 +2,7 @@
 import {Natives} from '/extension/js/modules/natives.js';
 import { Storage } from '/extension/js/modules/storage.js';
 import CryptoUtils from '/extension/js/modules/crypto-utils.js';
-import '/extension/js/did-methods/ion/ion-tools.js';
+import '/extension/js/did-methods/ion/ion.js';
 
 let PeerModel = {
   permissions: {}
@@ -67,25 +67,14 @@ let DID = {
       Natives.merge(entry, exists ? entry : createConnection(uri), obj);
     });
   },
-  async resolve(did){
-
-    return fetch('https://resolver.identity.foundation/1.0/identifiers/' + did).then(res => res.json());
+  async resolve(didUri){
+    let method = await getMethod(didUri.split(':')[1] || 'ion');
+    return method.resolve(didUri).then(res => res.json());
   },
-  async sign(didUri, message, decode){
+  async sign(didUri, message){
     let did = await this.get(didUri);
-    console.log(did, didUri);
-    switch (did.curve) {
-      case 'Ed25519':
-        let utils = await CryptoUtils;
-        let _message = Uint8Array.from(decode ? utils.base58.decode(message) : message);
-        let sig = utils.nacl.sign.detached(_message, utils.base58.decode(did.keys.private));
-        return utils.base58.encode(sig);
-      case 'ES256':
-        let crypt = new Jose.WebCryptographer();
-        crypt.setContentSignAlgorithm("ES256");
-        var signer = new Jose.JoseJWS.Signer(crypt);
-        return await signer.addSigner(testKey).then(async () => await signer.sign(message, null, {}));
-    }
+    let method = await getMethod(didUri.split(':')[1] || 'ion');
+    return method.sign(did.keys.signing.privateJwk, message);
   },
   async verify(publicKey, message, signature){
     //let did = this.resolve(didUri);

@@ -1,6 +1,6 @@
 
 
-import './ion-tools.js';
+import './ion.js';
 
 export default {
   name: 'ion',
@@ -41,5 +41,14 @@ export default {
   },
   async resolve (did){
     return ION.resolve(did);
+  },
+  async sign (privateJwk, message){
+    return ION.signJws({
+      payload: message,
+      privateJwk: privateJwk
+    });
+  },
+  async verify (privateJwk, message){
+
   }
 }

@@ -10,18 +10,28 @@ const NavigatorInterfaces = {
       return NavigatorInterfaces[property].metadata;
     }
   },
-  requestIdentifier: {
+  requestAccess: {
     metadata: {
       version: '0.0.1'
     },
     enumerable: true,
     writeable: false,
     configurable: false,
-    value: () => Messenger.send({
-      topic: 'requestIdentifier',
-      to: 'content',
-      callback: true
-    }).promise
+    value: (params = {}) => {
+      let did = params.identifier;
+      return Messenger.send({
+        topic: 'requestAccess',
+        to: 'content',
+        callback: true,
+        data: {
+          identifier: did || {
+            supportedMethods: params?.identifier?.supportedMethods || ['ion', 'key'],
+            challenge: did?.challenge || '123'
+          },
+          datastore: params?.datastore
+        }
+      }).promise
+    }
   },
   requestCredentials: {
     metadata: {
