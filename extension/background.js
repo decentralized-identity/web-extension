@@ -26,31 +26,3 @@ chrome.action.onClicked.addListener(tab => {
 chrome.tabs.onRemoved.addListener(tabId => {
   Browser.localStorage.remove('tab:' + tabId);
 })
-
-// setTimeout(function(){
-//   Messenger.send({
-//     topic: 'background > tab',
-//     to: 'content',
-//     tabs: [170],
-//     data: 'calling a specific tab',
-//   })
-
-//   Messenger.send({
-//     topic: 'background > tabs',
-//     to: 'content',
-//     data: 'test'
-//   })
-
-// }, 5000);
-
-// chrome.runtime.onInstalled.addListener(() => {
-//   console.log('installed');
-// });
-
-// chrome.action.onClicked.addListener(tab => {
-//   console.log(tab);
-// });
-
-// chrome.tabs.onCreated.addListener(tab => {
-//   console.log(tab);
-// })

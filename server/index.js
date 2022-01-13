@@ -1,5 +1,6 @@
 
 const fs = require('fs');
+const crypto = require("crypto");
 const Koa = require('koa');
 const Router = require('koa-router');
 const mount = require("koa-mount");
@@ -22,9 +23,21 @@ const didConfiguration = {
   }
 };
 
+const challenges = {}
+
 router.get('/', async (ctx, next) => {
   ctx.type = 'html';
   ctx.body = fs.createReadStream('server/index.html');
+  await next();
+});
+
+router.get('/authn', async (ctx, next) => {
+  let challenge = crypto.randomBytes(32).toString();
+  challenges[challenge] = {};
+  ctx.type = 'json';
+  ctx.body = {
+    challenge: challenge
+  };
   await next();
 });
 

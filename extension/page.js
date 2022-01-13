@@ -1,16 +1,47 @@
 
 import { ExtensionMessenger as Messenger } from '/extension/js/modules/extension-messenger.js';
+import DIDMethods from '/extension/js/did-methods/config.js';
 
 const NavigatorInterfaces = {
-  api: {
-    enumerable: false,
+  'api': {
+    enumerable: true,
     writeable: false,
     configurable: false,
-    value: function (property){
-      return NavigatorInterfaces[property].metadata;
+    value: property => NavigatorInterfaces[property].metadata
+  },
+  'supportedMethods': {
+    metadata: {
+      version: '0.0.1'
+    },
+    enumerable: true,
+    writeable: false,
+    configurable: false,
+    value: Object.keys(DIDMethods.supportedMethods)
+  },
+  'resolve': {
+    metadata: {
+      version: '0.0.1'
+    },
+    enumerable: true,
+    writeable: false,
+    configurable: false,
+    value: async (didUri) => {
+      let response = await Messenger.send({
+        topic: 'resolveIdentifier',
+        to: 'content',
+        callback: true,
+        data: {
+          identifier: didUri
+        }
+      }).promise;
+
+      if (response.error) throw response.error
+      else if (response.result) return {
+        result: response.result
+      }
     }
   },
-  requestAccess: {
+  'requestAccess': {
     metadata: {
       version: '0.0.1'
     },
@@ -33,7 +64,7 @@ const NavigatorInterfaces = {
       }).promise
     }
   },
-  requestCredentials: {
+  'requestCredentials': {
     metadata: {
       version: '0.0.1'
     },

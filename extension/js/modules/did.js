@@ -1,12 +1,14 @@
 
 import {Natives} from '/extension/js/modules/natives.js';
 import { Storage } from '/extension/js/modules/storage.js';
+import DIDMethods from '/extension/js/did-methods/config.js';
 import CryptoUtils from '/extension/js/modules/crypto-utils.js';
 import '/extension/js/did-methods/ion/ion.js';
 
 let PeerModel = {
   permissions: {}
 };
+
 let createConnection = (uri, options) => {
   let entry = JSON.parse(JSON.stringify(PeerModel));
   entry.id = uri;
@@ -31,6 +33,7 @@ async function getMethod(method){
 }
 
 let DID = {
+  supportedMethods: Object.keys(DIDMethods.supportedMethods),
   async create (options = {}){
     let module = await getMethod(options.method || 'ion');
     let did = await module.create();
@@ -40,6 +43,8 @@ let DID = {
     return did;
   },
   async createPeerDID (uri, options = {}){
+    // let { protocol, pathname } = new URL(uri);
+    // uri = protocol + pathname;
     let entry = await Storage.get('connections', uri) || createConnection(uri);
     if (entry.did) {
       return entry;
@@ -68,8 +73,8 @@ let DID = {
     });
   },
   async resolve(didUri){
-    let method = await getMethod(didUri.split(':')[1] || 'ion');
-    return method.resolve(didUri).then(res => res.json());
+    let method = await getMethod(didUri.split(':')[1]);
+    return method.resolve(didUri);
   },
   async sign(didUri, message){
     let did = await this.get(didUri);

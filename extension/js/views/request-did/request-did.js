@@ -49,7 +49,7 @@ create_pairwise_button.addEventListener('pointerup', async e => {
     }
   }
   console.log(globalThis.popupResult);
-  // await respond(globalThis.popupResult);
+  await respond(globalThis.popupResult);
 });
 
 block_did_requests.addEventListener('click', async e => {

@@ -2,7 +2,6 @@
 Promise.all([
   import('/extension/js/modules/env.js'),
   import('/extension/js/modules/did.js'),
-  import('/extension/js/did-methods/config.js'),
   import('/extension/js/modules/dom.js'),
   import('/extension/js/modules/uuid.js'),
   import('/extension/js/modules/browser.js'),
@@ -11,17 +10,35 @@ Promise.all([
 
   const Env = modules[0].Env;
   const DID = modules[1].DID;
-  const DIDMethods = modules[2].default;
-  const DOM = modules[3].DOM;
-  const UUID = modules[4].UUID;
-  const Browser = modules[5].Browser;
-  const Messenger = modules[6].ExtensionMessenger;
+  const DOM = modules[2].DOM;
+  const UUID = modules[3].UUID;
+  const Browser = modules[4].Browser;
+  const Messenger = modules[5].ExtensionMessenger;
  
   let pageScript = document.createElement('script');
       pageScript.type = 'module';
       pageScript.src = Env.baseUrl + '/page.js';
       pageScript.async = false;
       document.documentElement.prepend(pageScript);
+
+  Messenger.addListener('resolveIdentifier', async message => {
+    let params = message.data;
+    let did = params.identifier;
+    if (!did || typeof did !== 'string' || !did.startsWith('did:')) {
+      return {
+        error: `The value passed was not a valid DID URI`
+      };
+    }
+    let method = did.split(':')[1];
+    if (!DID.supportedMethods.includes(method)) {
+      return {
+        error: `The identifier provided is not of a supported DID Method`
+      };
+    }
+    return {
+      result: await DID.resolve(did)
+    }
+  });
 
   Messenger.addListener('requestAccess', async message => {
     let response = {};
