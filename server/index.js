@@ -6,6 +6,7 @@ const Router = require('koa-router');
 const mount = require("koa-mount");
 const static = require('koa-static');
 const bodyParser = require('koa-body');
+import ION from 'ion-tools';
 
 const app = new Koa();
 const router = new Router();
@@ -32,6 +33,25 @@ router.get('/', async (ctx, next) => {
 });
 
 router.get('/authn', async (ctx, next) => {
+  let challenge = crypto.randomBytes(32).toString();
+  challenges[challenge] = {};
+  ctx.type = 'json';
+  ctx.body = {
+    challenge: challenge
+  };
+  await next();
+});
+
+router.post('/authn', async (ctx, next) => {
+  let entry = challenges[ctx.body.challenge];
+  if (entry) {
+    if (entry.did && ctx.body.did) {
+      let result = await ION.resolve(ctx.body.did);
+      
+    }
+  }
+  else ctx.throw(406, 'Not Acceptable');
+
   let challenge = crypto.randomBytes(32).toString();
   challenges[challenge] = {};
   ctx.type = 'json';

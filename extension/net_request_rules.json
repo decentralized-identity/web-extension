@@ -1,13 +1,1 @@
-[
-  {
-    "id": 1,
-    "priority": 1,
-    "action": {
-      "type": "modifyHeaders",
-      "responseHeaders": [
-        { "header": "DID-Support", "operation": "set", "value": "1" }
-      ]
-    },
-    "condition": { "urlFilter": "*://*/*", "resourceTypes": ["main_frame"] }
-  }
-]
+[{"id":1,"priority":1,"action":{"type":"modifyHeaders","responseHeaders":[{"header":"DID-Support","operation":"set","value":"1"},{"header":"DID-Methods","operation":"set","value":"ion, key"}]},"condition":{"urlFilter":"*://*/*","resourceTypes":["main_frame"]}}]

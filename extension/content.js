@@ -44,8 +44,21 @@ Promise.all([
     let response = {};
     let params = message.data;
     let identifier = params.identifier;
+
+    console.log(await indexedDB.databases());
     let connection = await DID.getConnection(message.origin);
-    console.log(identifier, message.origin, connection);
+    
+    // let cxn = await Messenger.send({
+    //   topic: 'getConnection',
+    //   to: 'background',
+    //   callback: true,
+    //   data: {
+    //     origin: message.origin
+    //   }
+    // }).promise;
+
+
+    // console.log(cxn);
 
     if (identifier) {
       if (typeof identifier === 'string') {

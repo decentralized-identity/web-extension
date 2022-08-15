@@ -2,10 +2,8 @@
 
 import "./nano-sql.js";
 
-
 const nano = nSQL;
 const dbName = 'did-';
-
 const ready = nano().createDatabase({
   id: dbName,
   mode: 'PERM',
@@ -39,11 +37,7 @@ const ready = nano().createDatabase({
       }
     }
   ]
-});
-
-// const ready = async () => {
-//   return AceBase.WithIndexedDB('decentralized-identity');
-// }
+}) 
 
 
 var Storage = {
@@ -77,7 +71,9 @@ var Storage = {
   },
 
   async get (table, id){
-    return this.txn(db => db.ref(table + '/' + id))
+    return this.txn(db => db(table).query('select').where([
+      'id', '=', id
+    ]).exec())
     .then(rows => rows[0])
     .catch(e => console.log(e));
   },

@@ -1,6 +1,6 @@
 
 import { ExtensionMessenger as Messenger } from '/extension/js/modules/extension-messenger.js';
-import DIDMethods from '/extension/js/did-methods/config.js';
+import DIDMethods from '/extension/js/did-methods/config.mjs';
 
 const NavigatorInterfaces = {
   'api': {

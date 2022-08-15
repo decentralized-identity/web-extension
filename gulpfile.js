@@ -56,6 +56,20 @@ async function compileJS(){
   });
 }
 
+async function compileJS(){
+  return new Promise(async resolve => {
+    await fs.ensureDir(compiledJS);
+    mergeStreams(
+      ...Object.keys(assets.js).map(file => {
+        return gulp.src(assets.js[file])
+                   .pipe(terser())
+                   .pipe(concat(file + '.js'))
+                   .pipe(gulp.dest(compiledJS))
+      })
+    ).on('finish', () => resolve())
+  });
+}
+
 async function compileCSS(){
   return new Promise(async resolve => {
     await fs.ensureDir(compiledCSS);
@@ -81,10 +95,16 @@ async function renderTemplates() {
     .pipe(gulp.dest('./extension/views'))
 };
 
+async function compileNetRequestRules(){
+  let Rules = await import('./extension/net_request_rules.mjs').then(module => module.default);
+  fs.writeJSON(root + 'net_request_rules.json', Rules);
+}
+
 gulp.task('build', gulp.series(compileCSS, compileJS, renderTemplates));
 
 gulp.task('watch', () => {
   gulp.watch([root + '**/*.js', '!' + root + 'js/compiled/**/*'], compileJS);
   gulp.watch([root + '**/*.css', '!' + root + 'css/compiled/**/*'], compileCSS);
   gulp.watch(['templates/**/*'], gulp.parallel(renderTemplates));
+  gulp.watch([root + 'net_request_rules.mjs'], compileNetRequestRules);
 });

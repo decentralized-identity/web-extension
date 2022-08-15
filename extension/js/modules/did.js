@@ -1,9 +1,16 @@
 
-import {Natives} from '/extension/js/modules/natives.js';
+import { Natives } from '/extension/js/modules/natives.js';
 import { Storage } from '/extension/js/modules/storage.js';
-import DIDMethods from '/extension/js/did-methods/config.js';
-import CryptoUtils from '/extension/js/modules/crypto-utils.js';
+import { UUID } from '/extension/js/modules/uuid.js';
+import DIDMethods from '/extension/js/did-methods/config.mjs';
 import '/extension/js/did-methods/ion/ion.js';
+
+// import {
+//   JsonWebKey,
+//   JsonWebSignature
+// } from '/node_modules/@transmute/json-web-signature/dist/json-web-signature.esm.js';
+// import { verifiable } from '/node_modules/@transmute/vc.js/dist/vc.js.esm.js';
+
 
 let PeerModel = {
   permissions: {}
@@ -15,24 +22,11 @@ let createConnection = (uri, options) => {
   return entry;
 }
 
-var testKey = {
-  "kty": "EC",
-  "crv": "P-256",
-  "x": "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
-  "y": "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0",
-  "d": "jpsQnnGQmL-YBIffH1136cspYG6-0iY7X1fCE9-E9LI"
-}
-
-const jwsHeader = {
-  alg: 'EdDSA',
-  typ: 'JWT'
-};
-
 async function getMethod(method){
   return (await import(`../did-methods/${method}/index.js`)).default
 }
 
-let DID = {
+const DID = {
   supportedMethods: Object.keys(DIDMethods.supportedMethods),
   async create (options = {}){
     let module = await getMethod(options.method || 'ion');
@@ -79,26 +73,46 @@ let DID = {
   async sign(didUri, message){
     let did = await this.get(didUri);
     let method = await getMethod(didUri.split(':')[1] || 'ion');
-    return method.sign(did.keys.signing.privateJwk, message);
+    return {
+      id: did.keys.signing.id,
+      signature: method.sign(did.keys.signing.privateKey, message)
+    }
   },
-  async verify(publicKey, message, signature){
-    //let did = this.resolve(didUri);
-    // switch (did.curve) {
-    //   case 'Ed25519':
-        let utils = await CryptoUtils;
-
-        console.log()
-        return utils.nacl.sign.detached.verify(
-          utils.base58.decode(message),
-          utils.base58.decode(signature),
-          utils.base58.decode(publicKey)
-        );
-    //   case 'P-256':         
-    //     let crypt = new Jose.WebCryptographer();
-    //     crypt.setContentSignAlgorithm("ES256");
-    //     var signer = new Jose.JoseJWS.Signer(crypt);
-    //     return await signer.addSigner(testKey).then(async () => await signer.sign(message, null, {}));
-    // }
+  async verify(didUri, message){
+    let did = await this.get(didUri);
+    let method = await getMethod(didUri.split(':')[1] || 'ion');
+    method.verify(did, message);
+  },
+  async createCredential(didUri, credential){
+    let did = await DID.get(didUri);
+    const result = await verifiable.credential.create({
+      credential: Object.assign({
+        '@context': [
+          'https://www.w3.org/2018/credentials/v1',
+          'https://w3id.org/security/suites/jws-2020/v1',
+        ],
+        id: 'urn:uuid:' + UUID.v4(),
+        type: ['VerifiableCredential'],
+        issuer: {
+          id: did.canonicalId
+        },
+        issuanceDate: new Date().toISOString()
+      }, credential),
+      format: ['vc', 'vc-jwt'],
+      documentLoader: url => {
+        return DID.resolve(url);
+      },
+      suite: new JsonWebSignature({
+        key: await JsonWebKey.from({
+          id: did.canonicalId + did.keys.signing.id,
+          type: 'JsonWebKey2020',
+          controller: did.canonicalId,
+          publicKeyJwk: did.keys.signing.publicKey,
+          privateKeyJwk: did.keys.signing.privateKey
+        })
+      }),
+    });
+    console.log(result);
   }
 }
 

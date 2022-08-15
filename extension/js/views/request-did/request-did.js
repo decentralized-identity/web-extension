@@ -1,6 +1,6 @@
 
 
-import DIDMethods from '/extension/js/did-methods/config.js';
+import DIDMethods from '/extension/js/did-methods/config.mjs';
 import { DID } from '/extension/js/modules/did.js';
 import { DOM } from '/extension/js/modules/dom.js';
 import { UUID } from '/extension/js/modules/uuid.js';

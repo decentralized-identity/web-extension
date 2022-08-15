@@ -1,4 +1,7 @@
 
+// import { DID } from '/extension/js/modules/did.js';
+
+import '/extension/js/modules/acebase.js';
 import { Browser } from '/extension/js/modules/browser.js';
 import { ExtensionMessenger as Messenger } from '/extension/js/modules/extension-messenger.js';
 
@@ -25,4 +28,8 @@ chrome.action.onClicked.addListener(tab => {
 
 chrome.tabs.onRemoved.addListener(tabId => {
   Browser.localStorage.remove('tab:' + tabId);
-})
+});
+
+// Messenger.addListener('getConnection', async message => {
+//   return await DID.getConnection(message.data.origin);
+// });

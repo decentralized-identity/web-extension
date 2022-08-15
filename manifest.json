@@ -27,8 +27,8 @@
       "extension/views/*",
       "extension/js/modules/*",
       "extension/js/did-methods/*",
-      "extension/js/modules/extension-messenger.js",
-      "extension/page.js"
+      "extension/page.js",
+      "node_modules/@transmute/*"
     ],
     "matches": ["<all_urls>"]
   }],

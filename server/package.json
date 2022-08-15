@@ -13,6 +13,6 @@
     "koa-static": "4.0.2"
   },
   "dependencies": {
-    "@decentralized-identity/ion-tools": "0.0.1"
+    "@decentralized-identity/ion-tools": "0.1.0"
   }
 }
